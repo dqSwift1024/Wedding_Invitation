@@ -12,8 +12,6 @@ const Hero = ({ onEnter }) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-rose overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-5"></div>
-      
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
