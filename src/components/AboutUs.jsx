@@ -11,11 +11,11 @@ const AboutUs = () => {
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   const timeline = [
-    { year: '2018', event: '初次相遇', desc: '在大学的图书馆里，我们第一次相遇' },
-    { year: '2019', event: '相知相恋', desc: '共同的兴趣爱好让我们走到了一起' },
-    { year: '2021', event: '毕业旅行', desc: '一起走过山川湖海，看遍世间美景' },
-    { year: '2023', event: '求婚成功', desc: '在最美的日落时分，许下终身承诺' },
-    { year: '2025', event: '步入婚姻', desc: '执子之手，与子偕老' },
+    { stage: '相识', emoji: '👋', desc: '在大学的图书馆里，我们第一次相遇，那一刻，时间仿佛静止' },
+    { stage: '相知', emoji: '💕', desc: '共同的兴趣爱好让我们走到了一起，彼此了解，心灵相通' },
+    { stage: '相恋', emoji: '🌹', desc: '一起走过山川湖海，看遍世间美景，每一刻都是最美好的回忆' },
+    { stage: '承诺', emoji: '💍', desc: '在最美的日落时分，许下终身承诺，决定共度余生' },
+    { stage: '永恒', emoji: '💒', desc: '执子之手，与子偕老，开启人生新篇章' },
   ]
 
   const photos = [
@@ -185,7 +185,7 @@ const AboutUs = () => {
             variants={itemVariants}
             className="text-3xl font-bold text-center mb-12 text-gradient font-elegant"
           >
-            我们的爱情时间线
+            情感阶段
           </motion.h3>
           <div className="relative">
             {/* 时间线连接线 - 动画 */}
@@ -228,7 +228,7 @@ const AboutUs = () => {
                     />
                     <div className="relative z-10">
                       <motion.div 
-                        className="text-rose-gold-600 font-bold text-xl mb-2"
+                        className="flex items-center gap-3 mb-3"
                         initial={{ scale: 0 }}
                         animate={isInView ? { scale: 1 } : {}}
                         transition={{ 
@@ -237,10 +237,10 @@ const AboutUs = () => {
                           stiffness: 200
                         }}
                       >
-                        {item.year}
+                        <span className="text-4xl">{item.emoji}</span>
+                        <div className="text-rose-gold-600 font-bold text-xl">{item.stage}</div>
                       </motion.div>
-                      <div className="text-gray-800 font-semibold text-lg mb-2">{item.event}</div>
-                      <div className="text-gray-600">{item.desc}</div>
+                      <div className="text-gray-600 leading-relaxed">{item.desc}</div>
                     </div>
                   </motion.div>
                 </div>
