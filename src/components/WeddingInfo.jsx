@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaPalette } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaCloudSun } from 'react-icons/fa'
 
 const WeddingInfo = () => {
   const ref = useRef(null)
@@ -15,12 +15,18 @@ const WeddingInfo = () => {
     }
   }
 
-  const dressCodes = [
-    { color: 'bg-rose-gold-200', name: '玫瑰金', hex: '#FBCFE8' },
-    { color: 'bg-cream-200', name: '奶白色', hex: '#FEF3E7' },
-    { color: 'bg-rose-gold-100', name: '淡粉色', hex: '#FCE7F3' },
-    { color: 'bg-rose-gold-50', name: '浅金色', hex: '#FDF2F8' },
-  ]
+  const weatherInfo = {
+    date: '2025年10月20日',
+    condition: '晴',
+    temperature: '-2°C - 5°C',
+    icon: '☀️',
+    tips: [
+      { icon: '🧥', text: '建议穿着厚外套或羽绒服，注意保暖' },
+      { icon: '👔', text: '男士可选择西装外套搭配保暖内搭' },
+      { icon: '👗', text: '女士建议穿着长袖连衣裙或套装，搭配外套' },
+      { icon: '🧣', text: '建议佩戴围巾、手套等保暖配饰' },
+    ]
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -257,7 +263,7 @@ const WeddingInfo = () => {
             </div>
           </motion.div>
 
-          {/* Dress Code */}
+          {/* 天气提醒 */}
           <motion.div
             variants={cardVariants}
             className="bg-white rounded-2xl shadow-xl p-8 relative overflow-hidden group"
@@ -283,54 +289,73 @@ const WeddingInfo = () => {
                 whileHover={{ rotate: 360, scale: 1.1 }}
                 transition={{ duration: 0.5 }}
               >
-                <FaPalette className="text-white text-2xl" />
+                <FaCloudSun className="text-white text-2xl" />
               </motion.div>
               <div>
-                <h3 className="text-2xl font-bold text-rose-gold-600">Dress Code</h3>
-                <p className="text-gray-500">着装建议</p>
+                <h3 className="text-2xl font-bold text-rose-gold-600">天气提醒</h3>
+                <p className="text-gray-500">Weather Reminder</p>
               </div>
             </div>
-            <p className="text-gray-700 mb-6 relative z-10">
-              为了营造浪漫温馨的氛围，建议来宾穿着以下色系的服装：
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
-              {dressCodes.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                  animate={isInView ? { opacity: 1, scale: 1, rotate: 0 } : {}}
-                  transition={{ 
-                    duration: 0.5, 
-                    delay: 1 + index * 0.1,
-                    type: "spring",
-                    stiffness: 200
-                  }}
-                  whileHover={{ 
-                    scale: 1.1,
-                    rotate: 5,
-                    zIndex: 10,
-                    transition: { type: "spring", stiffness: 300 }
-                  }}
-                  className={`${item.color} rounded-xl p-4 text-center shadow-md relative overflow-hidden group`}
-                >
+            
+            {/* 天气信息卡片 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="bg-gradient-to-br from-rose-gold-50 to-cream-50 rounded-xl p-6 mb-6 relative z-10"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100"
-                    animate={{
-                      x: ['-100%', '200%']
+                    className="text-5xl"
+                    animate={{ 
+                      rotate: [0, 10, -10, 0],
+                      scale: [1, 1.1, 1]
                     }}
-                    transition={{
-                      duration: 1.5,
-                      ease: "linear"
+                    transition={{ 
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatDelay: 2
                     }}
-                  />
-                  <motion.div 
-                    className="w-full h-16 rounded-lg mb-2 relative z-10"
-                    style={{ backgroundColor: item.hex }}
-                    whileHover={{ scale: 1.1 }}
-                  />
-                  <p className="text-gray-700 font-medium relative z-10">{item.name}</p>
-                </motion.div>
-              ))}
+                  >
+                    {weatherInfo.icon}
+                  </motion.div>
+                  <div>
+                    <p className="text-gray-600 text-sm mb-1">{weatherInfo.date}</p>
+                    <p className="text-2xl font-bold text-rose-gold-600">{weatherInfo.condition}</p>
+                    <p className="text-gray-700 text-lg">{weatherInfo.temperature}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 穿衣建议 */}
+            <div className="relative z-10">
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">穿衣建议</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {weatherInfo.tips.map((tip, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ 
+                      delay: 0.7 + index * 0.1,
+                      duration: 0.5,
+                      type: "spring",
+                      stiffness: 100
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      x: 5,
+                      transition: { type: "spring", stiffness: 300 }
+                    }}
+                    className="flex items-center gap-3 bg-gradient-to-r from-cream-50 to-rose-gold-50 rounded-lg p-4 shadow-sm"
+                  >
+                    <span className="text-2xl">{tip.icon}</span>
+                    <p className="text-gray-700 flex-1">{tip.text}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </motion.div>
