@@ -1,11 +1,10 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import 'swiper/css/effect-fade'
 
 const AboutUs = () => {
   const ref = useRef(null)
@@ -290,38 +289,87 @@ const AboutUs = () => {
             美好回忆
           </motion.h3>
           <Swiper
-            modules={[Navigation, Pagination, Autoplay, EffectFade]}
-            effect="fade"
+            modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={30}
             slidesPerView={1}
             navigation
             pagination={{ clickable: true }}
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
+              640: { 
+                slidesPerView: 2,
+                spaceBetween: 20
+              },
+              1024: { 
+                slidesPerView: 3,
+                spaceBetween: 30
+              },
             }}
             className="pb-12"
           >
-            {photos.map(photo => (
+            {photos.map((photo, index) => (
               <SwiperSlide key={photo.id}>
                 <motion.div 
-                  className="overflow-hidden rounded-xl shadow-lg group"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  className="overflow-hidden rounded-xl shadow-lg group relative"
+                  variants={itemVariants}
+                  whileHover={{ 
+                    scale: 1.05,
+                    zIndex: 10,
+                    transition: { type: "spring", stiffness: 300 }
+                  }}
                 >
-                  <motion.img
+                  {/* 图片加载占位 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-rose-gold-100 to-rose-gold-200 flex items-center justify-center z-0">
+                    <motion.div
+                      className="w-8 h-8 border-2 border-rose-gold-400 border-t-transparent rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                  
+                  {/* 图片 */}
+                  <img
                     src={photo.url}
                     alt={photo.alt}
-                    className="w-full h-64 object-cover"
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={isInView ? { scale: 1, opacity: 1 } : {}}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    whileHover={{ scale: 1.1 }}
+                    className="w-full h-64 object-cover relative z-10 transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
                     onError={(e) => {
                       e.target.src = `https://via.placeholder.com/400x300/f9a8d4/ffffff?text=${photo.alt}`
+                      e.target.onerror = null
+                    }}
+                    onLoad={(e) => {
+                      // 图片加载完成后隐藏占位
+                      const placeholder = e.target.parentElement?.querySelector('.absolute')
+                      if (placeholder) {
+                        placeholder.style.opacity = '0'
+                        setTimeout(() => {
+                          placeholder.style.display = 'none'
+                        }, 300)
+                      }
                     }}
                   />
+                  
+                  {/* 悬浮遮罩 */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <p className="font-semibold text-sm">{photo.alt}</p>
+                    </div>
+                  </div>
+                  
+                  {/* 光效 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none">
+                    <motion.div
+                      className="w-full h-full"
+                      animate={{
+                        x: ['-100%', '200%']
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    />
+                  </div>
                 </motion.div>
               </SwiperSlide>
             ))}
