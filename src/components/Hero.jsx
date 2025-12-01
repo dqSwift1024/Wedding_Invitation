@@ -56,8 +56,23 @@ const Hero = ({ onEnter }) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-rose overflow-hidden">
+      {/* 背景视频（如果存在） */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        style={{ opacity: 0.3 }}
+      >
+        <source src="/videos/hero-background.mp4" type="video/mp4" />
+      </video>
+      
+      {/* 视频遮罩 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20 z-5"></div>
+      
       {/* 背景粒子效果 */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden z-10">
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}

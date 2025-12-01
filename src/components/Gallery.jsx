@@ -13,12 +13,13 @@ const Gallery = () => {
   const [loadedImages, setLoadedImages] = useState(new Set())
 
   const photos = [
-    { id: 1, url: '/images/wedding-1.jpg', alt: '婚纱照1' },
-    { id: 2, url: '/images/wedding-2.jpg', alt: '婚纱照2' },
-    { id: 3, url: '/images/wedding-3.jpg', alt: '婚纱照3' },
-    { id: 4, url: '/images/wedding-4.jpg', alt: '婚纱照4' },
-    { id: 5, url: '/images/wedding-5.jpg', alt: '婚纱照5' },
-    { id: 6, url: '/images/wedding-6.jpg', alt: '婚纱照6' },
+    { id: 1, url: '/images/wedding-1.jpg', alt: '婚纱照1', type: 'image' },
+    { id: 2, url: '/images/wedding-2.jpg', alt: '婚纱照2', type: 'image' },
+    { id: 3, url: '/images/wedding-3.jpg', alt: '婚纱照3', type: 'image' },
+    { id: 4, url: '/images/wedding-4.jpg', alt: '婚纱照4', type: 'image' },
+    { id: 5, url: '/images/wedding-5.jpg', alt: '婚纱照5', type: 'image' },
+    { id: 6, url: '/images/wedding-6.jpg', alt: '婚纱照6', type: 'image' },
+    { id: 7, url: '/videos/wedding-video.mp4', alt: '婚礼视频', type: 'video' },
   ]
 
   const handleImageLoad = (id) => {
@@ -147,7 +148,7 @@ const Gallery = () => {
                   {/* 加载占位 */}
                   {!loadedImages.has(photo.id) && (
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-rose-gold-100 to-rose-gold-200 flex items-center justify-center"
+                      className="absolute inset-0 bg-gradient-to-br from-rose-gold-100 to-rose-gold-200 flex items-center justify-center z-10"
                       initial={{ opacity: 1 }}
                       animate={{ opacity: loadedImages.has(photo.id) ? 0 : 1 }}
                       exit={{ opacity: 0 }}
@@ -160,23 +161,39 @@ const Gallery = () => {
                     </motion.div>
                   )}
 
-                  {/* 图片 */}
-                  <motion.img
-                    src={photo.url}
-                    alt={photo.alt}
-                    className="w-full h-[400px] md:h-[500px] object-cover"
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={{ 
-                      scale: loadedImages.has(photo.id) ? 1 : 1.2,
-                      opacity: loadedImages.has(photo.id) ? 1 : 0
-                    }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    onLoad={() => handleImageLoad(photo.id)}
-                    onError={(e) => {
-                      e.target.src = `https://via.placeholder.com/400x600/f9a8d4/ffffff?text=${photo.alt}`
-                      handleImageLoad(photo.id)
-                    }}
-                  />
+                  {/* 图片或视频 */}
+                  {photo.type === 'video' ? (
+                    <motion.video
+                      src={photo.url}
+                      controls
+                      className="w-full h-[400px] md:h-[500px] object-cover"
+                      initial={{ scale: 1.2, opacity: 0 }}
+                      animate={{ 
+                        scale: loadedImages.has(photo.id) ? 1 : 1.2,
+                        opacity: loadedImages.has(photo.id) ? 1 : 0
+                      }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      onLoadedData={() => handleImageLoad(photo.id)}
+                      onError={() => handleImageLoad(photo.id)}
+                    />
+                  ) : (
+                    <motion.img
+                      src={photo.url}
+                      alt={photo.alt}
+                      className="w-full h-[400px] md:h-[500px] object-cover"
+                      initial={{ scale: 1.2, opacity: 0 }}
+                      animate={{ 
+                        scale: loadedImages.has(photo.id) ? 1 : 1.2,
+                        opacity: loadedImages.has(photo.id) ? 1 : 0
+                      }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      onLoad={() => handleImageLoad(photo.id)}
+                      onError={(e) => {
+                        e.target.src = `https://via.placeholder.com/400x600/f9a8d4/ffffff?text=${photo.alt}`
+                        handleImageLoad(photo.id)
+                      }}
+                    />
+                  )}
 
                   {/* 悬浮遮罩 */}
                   <motion.div
