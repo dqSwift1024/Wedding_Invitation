@@ -1,0 +1,10 @@
+# Gitee Pages 自动构建配置
+# 如果 Gitee Pages 支持自动构建，可以使用此配置
+
+build:
+  - npm install
+  - npm run build
+
+publish:
+  - dist
+

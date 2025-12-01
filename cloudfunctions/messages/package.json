@@ -1,0 +1,10 @@
+{
+  "name": "messages",
+  "version": "1.0.0",
+  "description": "留言 API 云函数",
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "^2.5.0"
+  }
+}
+

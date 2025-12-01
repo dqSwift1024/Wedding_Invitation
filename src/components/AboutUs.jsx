@@ -1,11 +1,11 @@
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import 'swiper/css/effect-fade'
 
 const AboutUs = () => {
   const ref = useRef(null)
@@ -26,116 +26,277 @@ const AboutUs = () => {
     { id: 4, url: '/images/couple-4.jpg', alt: '合照4' },
   ]
 
+  // 容器动画变体
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2
+      }
+    }
+  }
+
+  // 子元素动画变体
+  const itemVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  }
+
+  // 照片动画变体
+  const photoVariants = {
+    hidden: { opacity: 0, scale: 0.8, x: -50 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  }
+
   return (
-    <section id="about-us" ref={ref} className="py-20 px-4 bg-white">
-      <div className="max-w-6xl mx-auto">
+    <section id="about-us" ref={ref} className="py-20 px-4 bg-white relative overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-rose-gold-200 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-64 h-64 bg-rose-gold-300 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gradient mb-4 font-elegant">
+          <motion.h2 
+            variants={itemVariants}
+            className="text-4xl md:text-5xl font-bold text-gradient mb-4 font-elegant"
+          >
             About Us
-          </h2>
-          <p className="text-rose-gold-500 text-lg">我们的故事</p>
+          </motion.h2>
+          <motion.p 
+            variants={itemVariants}
+            className="text-rose-gold-500 text-lg"
+          >
+            我们的故事
+          </motion.p>
         </motion.div>
 
-        {/* 新人照片 */}
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
+        {/* 新人照片 - 增强动画 */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid md:grid-cols-2 gap-8 mb-20"
+        >
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center"
+            variants={photoVariants}
+            className="text-center group"
           >
-            <div className="relative mb-6 overflow-hidden rounded-2xl shadow-xl">
-              <img
+            <motion.div 
+              className="relative mb-6 overflow-hidden rounded-2xl shadow-xl"
+              whileHover={{ scale: 1.05, rotate: 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.img
                 src="/images/groom.jpg"
                 alt="新郎"
                 className="w-full h-auto object-cover"
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                transition={{ duration: 1, ease: "easeOut" }}
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/400x600/f9a8d4/ffffff?text=新郎'
                 }}
               />
-            </div>
-            <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Ming</h3>
+              {/* 图片加载时的遮罩 */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+              />
+            </motion.div>
+            <motion.h3 
+              className="text-2xl font-bold text-rose-gold-600 mb-2"
+              whileHover={{ scale: 1.1 }}
+            >
+              Ming
+            </motion.h3>
             <p className="text-gray-600">温柔体贴，热爱生活</p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center"
+            variants={photoVariants}
+            className="text-center group"
           >
-            <div className="relative mb-6 overflow-hidden rounded-2xl shadow-xl">
-              <img
+            <motion.div 
+              className="relative mb-6 overflow-hidden rounded-2xl shadow-xl"
+              whileHover={{ scale: 1.05, rotate: -1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.img
                 src="/images/bride.jpg"
                 alt="新娘"
                 className="w-full h-auto object-cover"
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/400x600/fbcfe8/ffffff?text=新娘'
                 }}
               />
-            </div>
-            <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Xin</h3>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+              />
+            </motion.div>
+            <motion.h3 
+              className="text-2xl font-bold text-rose-gold-600 mb-2"
+              whileHover={{ scale: 1.1 }}
+            >
+              Xin
+            </motion.h3>
             <p className="text-gray-600">美丽善良，充满活力</p>
           </motion.div>
-        </div>
+        </motion.div>
 
-        {/* 时间线 */}
+        {/* 时间线 - 增强动画 */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
           className="mb-20"
         >
-          <h3 className="text-3xl font-bold text-center mb-12 text-gradient font-elegant">
+          <motion.h3 
+            variants={itemVariants}
+            className="text-3xl font-bold text-center mb-12 text-gradient font-elegant"
+          >
             我们的爱情时间线
-          </h3>
+          </motion.h3>
           <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-rose-gold-200 to-rose-gold-400 hidden md:block"></div>
+            {/* 时间线连接线 - 动画 */}
+            <motion.div
+              className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-rose-gold-200 via-rose-gold-400 to-rose-gold-200 hidden md:block"
+              initial={{ scaleY: 0 }}
+              animate={isInView ? { scaleY: 1 } : {}}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              style={{ transformOrigin: "top" }}
+            />
+            
             {timeline.map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+                variants={itemVariants}
                 className={`flex items-center mb-12 ${
                   index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
                 }`}
               >
                 <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
-                  <div className="bg-gradient-to-br from-cream-50 to-rose-gold-50 p-6 rounded-xl shadow-lg">
-                    <div className="text-rose-gold-600 font-bold text-xl mb-2">{item.year}</div>
-                    <div className="text-gray-800 font-semibold text-lg mb-2">{item.event}</div>
-                    <div className="text-gray-600">{item.desc}</div>
-                  </div>
+                  <motion.div
+                    className="bg-gradient-to-br from-cream-50 to-rose-gold-50 p-6 rounded-xl shadow-lg relative overflow-hidden group"
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: "0 20px 40px rgba(236, 72, 153, 0.2)",
+                      transition: { type: "spring", stiffness: 300 }
+                    }}
+                  >
+                    {/* 背景光效 */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100"
+                      animate={{
+                        x: ['-100%', '200%']
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    />
+                    <div className="relative z-10">
+                      <motion.div 
+                        className="text-rose-gold-600 font-bold text-xl mb-2"
+                        initial={{ scale: 0 }}
+                        animate={isInView ? { scale: 1 } : {}}
+                        transition={{ 
+                          delay: index * 0.2 + 0.5,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                      >
+                        {item.year}
+                      </motion.div>
+                      <div className="text-gray-800 font-semibold text-lg mb-2">{item.event}</div>
+                      <div className="text-gray-600">{item.desc}</div>
+                    </div>
+                  </motion.div>
                 </div>
-                <div className="hidden md:block w-8 h-8 rounded-full bg-rose-gold-500 border-4 border-white shadow-lg z-10"></div>
+                
+                {/* 时间节点 - 脉冲动画 */}
+                <motion.div 
+                  className="hidden md:block w-8 h-8 rounded-full bg-rose-gold-500 border-4 border-white shadow-lg z-10 relative"
+                  initial={{ scale: 0 }}
+                  animate={isInView ? { scale: 1 } : {}}
+                  transition={{ 
+                    delay: index * 0.2 + 0.3,
+                    type: "spring",
+                    stiffness: 200
+                  }}
+                >
+                  {/* 脉冲效果 */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-rose-gold-400"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.6, 0, 0.6]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </motion.div>
                 <div className={`hidden md:block w-1/2 ${index % 2 === 0 ? 'pl-8' : 'pr-8'}`}></div>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        {/* 合照轮播 */}
+        {/* 合照轮播 - 增强效果 */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 1.2 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
         >
-          <h3 className="text-3xl font-bold text-center mb-8 text-gradient font-elegant">
+          <motion.h3 
+            variants={itemVariants}
+            className="text-3xl font-bold text-center mb-8 text-gradient font-elegant"
+          >
             美好回忆
-          </h3>
+          </motion.h3>
           <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
+            modules={[Navigation, Pagination, Autoplay, EffectFade]}
+            effect="fade"
             spaceBetween={30}
             slidesPerView={1}
             navigation
             pagination={{ clickable: true }}
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            autoplay={{ delay: 4000, disableOnInteraction: false }}
             breakpoints={{
               640: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
@@ -144,16 +305,24 @@ const AboutUs = () => {
           >
             {photos.map(photo => (
               <SwiperSlide key={photo.id}>
-                <div className="overflow-hidden rounded-xl shadow-lg">
-                  <img
+                <motion.div 
+                  className="overflow-hidden rounded-xl shadow-lg group"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <motion.img
                     src={photo.url}
                     alt={photo.alt}
-                    className="w-full h-64 object-cover hover:scale-110 transition-transform duration-500"
+                    className="w-full h-64 object-cover"
+                    initial={{ scale: 1.2, opacity: 0 }}
+                    animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    whileHover={{ scale: 1.1 }}
                     onError={(e) => {
                       e.target.src = `https://via.placeholder.com/400x300/f9a8d4/ffffff?text=${photo.alt}`
                     }}
                   />
-                </div>
+                </motion.div>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -164,4 +333,3 @@ const AboutUs = () => {
 }
 
 export default AboutUs
-

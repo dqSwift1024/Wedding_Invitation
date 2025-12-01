@@ -124,6 +124,16 @@ wedding-invitation/
 
 ## 🌐 部署指南
 
+### 🇨🇳 国内用户（推荐）
+
+**由于 Vercel 在国内访问不稳定，国内用户请使用以下方案：**
+
+- **Gitee Pages**（最简单）：查看 [国内部署指南](./DEPLOY_CN.md#方案一gitee-pages最推荐)
+- **腾讯云开发**（支持后端）：查看 [国内部署指南](./DEPLOY_CN.md#方案三腾讯云开发-cloudbase最佳支持后端)
+- **其他方案**：查看 [DEPLOY_CN.md](./DEPLOY_CN.md) 了解所有国内部署选项
+
+### 🌍 海外用户
+
 ### 部署到 Vercel
 
 1. 将代码推送到 GitHub
