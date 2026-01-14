@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何打开婚礼请柬？</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .arrow-hint {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      animation: bounce 1.5s infinite;
+    }
+
+    .arrow-hint svg {
+      width: 50px;
+      height: 50px;
+      fill: #EC4899;
+      filter: drop-shadow(0 2px 8px rgba(236, 72, 153, 0.3));
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    h1 {
+      color: #EC4899;
+      font-size: 26px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #6B7280;
+      font-size: 15px;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .steps {
+      background: linear-gradient(135deg, #FDF2F8, #FCE7F3);
+      border-radius: 12px;
+      padding: 24px 20px;
+      margin: 25px 0;
+      text-align: left;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      animation: fadeIn 0.5s ease-out backwards;
+    }
+
+    .step:nth-child(1) { animation-delay: 0.2s; }
+    .step:nth-child(2) { animation-delay: 0.4s; }
+    .step:nth-child(3) { animation-delay: 0.6s; }
+
+    .step:last-child { margin-bottom: 0; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .step-num {
+      background: linear-gradient(135deg, #EC4899, #F472B6);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 14px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+    }
+
+    .step-text {
+      color: #374151;
+      font-size: 15px;
+      line-height: 1.6;
+      padding-top: 4px;
+    }
+
+    .step-text strong {
+      color: #EC4899;
+      font-weight: 600;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      flex: 1;
+      background: linear-gradient(135deg, #EC4899, #F472B6);
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: #FDF2F8;
+      color: #EC4899;
+      border: 2px solid #FBCFE8;
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: #FCE7F3;
+      border-color: #F9A8D4;
+    }
+
+    .divider {
+      margin: 25px 0;
+      color: #D1D5DB;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #E5E7EB, transparent);
+    }
+
+    .divider span {
+      padding: 0 12px;
+      color: #9CA3AF;
+    }
+
+    .tips {
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.6;
+      margin-top: 20px;
+      padding: 15px;
+      background: #F9FAFB;
+      border-radius: 8px;
+    }
+
+    .link-text {
+      color: #EC4899;
+      font-weight: 500;
+      word-break: break-all;
+      display: block;
+      margin-top: 8px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 35px 25px; }
+      h1 { font-size: 24px; }
+      .buttons { flex-direction: column; }
+      .arrow-hint { top: 15px; right: 15px; }
+      .arrow-hint svg { width: 40px; height: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 右上角箭头提示 -->
+  <div class="arrow-hint">
+    <svg viewBox="0 0 24 24">
+      <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      <circle cx="19" cy="5" r="3" fill="#F472B6"/>
+      <circle cx="19" cy="5" r="2" fill="white"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <div class="icon">💝</div>
+    <h1>Ming & Xin 婚礼请柬</h1>
+    <p class="subtitle">
+      为了更好的浏览体验<br>
+      请在浏览器中打开
+    </p>
+    
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          点击右上角 <strong>"···"</strong> 菜单按钮
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          在弹出菜单中选择<br><strong>"在浏览器中打开"</strong> 或 <strong>"用Safari打开"</strong>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          即可查看完整的婚礼请柬
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-secondary" onclick="copyLink()">
+        <span>📋</span>
+        <span>复制链接</span>
+      </button>
+      <button class="btn" onclick="tryOpen()">
+        <span>💌</span>
+        <span>尝试打开</span>
+      </button>
+    </div>
+
+    <div class="divider">
+      <span>或复制链接到浏览器</span>
+    </div>
+
+    <div class="tips">
+      <div>长按以下链接可复制：</div>
+      <span class="link-text" id="link"></span>
+    </div>
+  </div>
+
+  <script>
+    // 获取实际链接
+    const actualLink = window.location.origin + '/';
+    document.getElementById('link').textContent = actualLink;
+
+    // 复制链接功能
+    function copyLink() {
+      const link = actualLink;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link)
+          .then(() => {
+            alert('✅ 链接已复制！\n请粘贴到浏览器打开');
+          })
+          .catch(() => {
+            fallbackCopy(link);
+          });
+      } else {
+        fallbackCopy(link);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const input = document.createElement('input');
+      input.value = text;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      
+      try {
+        document.execCommand('copy');
+        alert('✅ 链接已复制！\n请粘贴到浏览器打开');
+      } catch (err) {
+        alert('❌ 复制失败\n请长按链接手动复制');
+      }
+      
+      document.body.removeChild(input);
+    }
+
+    // 尝试打开
+    function tryOpen() {
+      window.location.href = actualLink;
+    }
+
+    // 检测环境
+    function detectEnvironment() {
+      const ua = navigator.userAgent;
+      const isWeChat = /MicroMessenger/i.test(ua);
+      const isQQ = /QQ/i.test(ua);
+      
+      if (!isWeChat && !isQQ) {
+        // 不在微信/QQ中，直接跳转
+        window.location.href = actualLink;
+      }
+    }
+
+    // 页面加载时检测
+    window.addEventListener('load', detectEnvironment);
+  </script>
+</body>
+</html>
