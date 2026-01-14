@@ -5,79 +5,21 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* 移动端滚动优化 */
-    -webkit-overflow-scrolling: touch;
-    /* 禁止文本选择（移动端优化） */
-    -webkit-tap-highlight-color: transparent;
   }
   
   body {
     @apply bg-cream-50 text-gray-800;
     font-family: 'Playfair Display', 'Georgia', serif;
-    overflow-x: hidden;
-    /* 移动端触摸优化 */
-    touch-action: pan-y;
-    /* 防止iOS Safari的橡皮筋效果 */
-    overscroll-behavior-y: contain;
-  }
-
-  * {
-    @apply transition-colors duration-200;
-  }
-
-  /* 移动端按钮优化 */
-  button, a {
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  /* 移动端图片优化 */
-  img {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-  }
-
-  /* 移动端输入框优化 */
-  input, textarea {
-    -webkit-appearance: none;
-    border-radius: 0;
   }
 }
 
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-rose-gold-400 via-rose-gold-500 to-rose-gold-600 bg-clip-text text-transparent;
-    background-size: 200% auto;
-    animation: gradient-shift 3s ease infinite;
   }
   
   .bg-gradient-rose {
     @apply bg-gradient-to-br from-cream-50 via-rose-gold-50 to-cream-100;
-  }
-
-  /* 3D 变换支持 */
-  .preserve-3d {
-    transform-style: preserve-3d;
-  }
-
-  /* 性能优化 */
-  .will-change-transform {
-    will-change: transform;
-  }
-
-  .will-change-opacity {
-    will-change: opacity;
-  }
-}
-
-/* 渐变文字动画 */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
   }
 }
 
@@ -92,37 +34,11 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-rose-gold-300 rounded-full;
-  transition: background-color 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-rose-gold-400;
 }
 
-/* 选择文本样式 */
-::selection {
-  @apply bg-rose-gold-200 text-gray-800;
-}
 
-::-moz-selection {
-  @apply bg-rose-gold-200 text-gray-800;
-}
-
-/* 平滑滚动增强 */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-/* 图片加载优化 */
-img {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
-
-/* 焦点可见性 */
-*:focus-visible {
-  @apply outline-2 outline-offset-2 outline-rose-gold-400;
-}
 
