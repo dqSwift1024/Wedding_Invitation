@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清除 Service Worker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e91e63;
+        }
+        button {
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #c2185b;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            display: block;
+        }
+        .error {
+            background: #ffcdd2;
+            color: #c62828;
+            display: block;
+        }
+        .info {
+            background: #e3f2fd;
+            color: #1565c0;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 清除 Service Worker 和缓存</h1>
+        
+        <div class="info">
+            <strong>说明：</strong>如果网站无法正常显示，点击下面的按钮清除所有缓存和Service Worker，然后重新访问网站。
+        </div>
+
+        <button onclick="unregisterServiceWorker()">1. 注销 Service Worker</button>
+        <button onclick="clearAllCaches()">2. 清除所有缓存</button>
+        <button onclick="clearAll()">3. 全部清除（推荐）</button>
+        <button onclick="goToHome()">4. 返回首页</button>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+
+        function showStatus(message, type = 'success') {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        async function unregisterServiceWorker() {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                if (registrations.length === 0) {
+                    showStatus('没有发现 Service Worker', 'info');
+                    return;
+                }
+
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+                showStatus(`✅ 成功注销 ${registrations.length} 个 Service Worker！`, 'success');
+            } catch (error) {
+                showStatus('❌ 注销失败: ' + error.message, 'error');
+            }
+        }
+
+        async function clearAllCaches() {
+            try {
+                const cacheNames = await caches.keys();
+                if (cacheNames.length === 0) {
+                    showStatus('没有发现缓存', 'info');
+                    return;
+                }
+
+                for (let cacheName of cacheNames) {
+                    await caches.delete(cacheName);
+                }
+                showStatus(`✅ 成功清除 ${cacheNames.length} 个缓存！`, 'success');
+            } catch (error) {
+                showStatus('❌ 清除缓存失败: ' + error.message, 'error');
+            }
+        }
+
+        async function clearAll() {
+            try {
+                // 注销 Service Worker
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+
+                // 清除所有缓存
+                const cacheNames = await caches.keys();
+                for (let cacheName of cacheNames) {
+                    await caches.delete(cacheName);
+                }
+
+                // 清除 localStorage
+                localStorage.clear();
+                
+                // 清除 sessionStorage
+                sessionStorage.clear();
+
+                showStatus(`✅ 全部清除成功！\n- Service Worker: ${registrations.length} 个\n- 缓存: ${cacheNames.length} 个\n- 本地存储已清除\n\n请点击"返回首页"或手动刷新页面`, 'success');
+            } catch (error) {
+                showStatus('❌ 清除失败: ' + error.message, 'error');
+            }
+        }
+
+        function goToHome() {
+            window.location.href = '/';
+        }
+
+        // 页面加载时显示当前状态
+        window.addEventListener('load', async () => {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                const cacheNames = await caches.keys();
+                
+                let info = '当前状态:\n';
+                info += `- Service Worker: ${registrations.length} 个\n`;
+                info += `- 缓存: ${cacheNames.length} 个`;
+                
+                if (registrations.length > 0 || cacheNames.length > 0) {
+                    showStatus(info, 'info');
+                }
+            } catch (error) {
+                console.error('获取状态失败:', error);
+            }
+        });
+    </script>
+</body>
+</html>
