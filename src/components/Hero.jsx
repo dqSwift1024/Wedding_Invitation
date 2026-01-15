@@ -12,6 +12,22 @@ const Hero = ({ onEnter }) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-rose overflow-hidden">
+      {/* 视频背景 */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        >
+          <source src="/videos/hero-background.mp4" type="video/mp4" />
+        </video>
+        {/* 渐变遮罩层 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-rose-50/50 via-rose-100/30 to-rose-50/50"></div>
+      </div>
+      
+      {/* 图案背景作为备用 */}
       <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-5"></div>
       
       <motion.div
