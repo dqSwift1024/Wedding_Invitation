@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
 
-const Hero = ({ onEnter }) => {
+const Hero = ({ onEnter, guestName, guestGroup }) => {
   const scrollToNext = () => {
     const nextSection = document.querySelector('#about-us')
     if (nextSection) {
@@ -36,6 +36,27 @@ const Hero = ({ onEnter }) => {
         transition={{ duration: 1, delay: 0.3 }}
         className="text-center z-20 px-4"
       >
+        {/* 个性化问候语 */}
+        {guestName && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mb-6"
+          >
+            <div className="inline-block bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl px-8 py-4 border-2 border-rose-200">
+              <p className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
+                {guestName}，您好！
+              </p>
+              {guestGroup && (
+                <p className="text-sm md:text-base text-gray-600 mt-1">
+                  {guestGroup}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
@@ -61,10 +82,31 @@ const Hero = ({ onEnter }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="text-xl md:text-2xl text-rose-gold-600 mb-12 font-light tracking-wider"
+          className="text-xl md:text-2xl text-rose-gold-600 mb-4 font-light tracking-wider"
         >
           2025.10.20
         </motion.p>
+
+        {/* 个性化邀请文案 */}
+        {guestName ? (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.3 }}
+            className="text-lg md:text-xl text-rose-700 mb-12 font-light"
+          >
+            诚挚邀请您参加我们的婚礼
+          </motion.p>
+        ) : (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.3 }}
+            className="text-lg md:text-xl text-rose-700 mb-12 font-light"
+          >
+            诚邀您见证我们的幸福时刻
+          </motion.p>
+        )}
 
         <motion.button
           initial={{ opacity: 0, y: 20 }}
