@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../config/supabase'
+import { getVisitorInfo, formatAddress } from '../utils/ipGeoLocation'
 
 /**
  * 宾客追踪 Hook
@@ -91,18 +92,55 @@ export const useGuestTracking = () => {
 
       // 记录详细访问日志
       if (isNewSession) {
+        // 获取访客IP和地理位置信息
+        const visitorInfo = await getVisitorInfo()
+        const address = formatAddress(visitorInfo)
+
+        // 同时更新guests表的地理位置信息（首次访问时）
+        if (isFirstVisit) {
+          await supabase
+            .from('guests')
+            .update({
+              visitor_country: visitorInfo.country,
+              visitor_region: visitorInfo.region,
+              visitor_city: visitorInfo.city,
+              visitor_address: address
+            })
+            .eq('guest_id', guestData.guest_id)
+        }
+
+        // 插入访问日志
         await supabase.from('guest_visits').insert([{
           guest_id: guestData.guest_id,
           guest_name: guestData.guest_name,
-          visitor_ip: await getVisitorIP(),
+          visitor_ip: visitorInfo.ip,
           device_type: getDeviceType(),
           browser: getBrowserName(),
           user_agent: navigator.userAgent,
           referrer: document.referrer || '直接访问',
           page_url: window.location.href,
           visit_time: now,
-          is_first_visit: isFirstVisit
+          is_first_visit: isFirstVisit,
+          // 地理位置信息
+          visitor_country: visitorInfo.country,
+          visitor_region: visitorInfo.region,
+          visitor_city: visitorInfo.city,
+          visitor_address: address,
+          visitor_latitude: visitorInfo.latitude,
+          visitor_longitude: visitorInfo.longitude,
+          visitor_timezone: visitorInfo.timezone,
+          visitor_isp: visitorInfo.isp,
+          // 定位方式
+          location_method: visitorInfo.location_method || 'ip',
+          location_accuracy: visitorInfo.accuracy || null
         }])
+
+        // 显示定位信息
+        if (visitorInfo.location_method === 'gps') {
+          console.log(`📍 GPS定位: ${address} (精度: ${Math.round(visitorInfo.accuracy)}米)`)
+        } else {
+          console.log(`📍 IP定位: ${address}`)
+        }
       }
     } catch (error) {
       console.error('记录访问失败:', error)
@@ -110,19 +148,6 @@ export const useGuestTracking = () => {
   }
 
   return { guest, loading }
-}
-
-/**
- * 获取访客 IP 地址
- */
-const getVisitorIP = async () => {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json')
-    const data = await response.json()
-    return data.ip
-  } catch (error) {
-    return '未知'
-  }
 }
 
 /**

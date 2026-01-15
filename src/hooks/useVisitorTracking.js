@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { supabase, isSupabaseConfigured } from '../config/supabase'
+import { getVisitorInfo, formatAddress } from '../utils/ipGeoLocation'
 
 /**
  * 访客追踪 Hook
- * 自动记录访客信息到数据库
+ * 自动记录访客信息到数据库（用于匿名访客）
  */
 export const useVisitorTracking = () => {
   useEffect(() => {
@@ -15,15 +16,27 @@ export const useVisitorTracking = () => {
 
     const trackVisitor = async () => {
       try {
+        // 获取访客IP和地理位置信息
+        const visitorInfo = await getVisitorInfo()
+        const address = formatAddress(visitorInfo)
+
         // 获取访客信息
         const visitorData = {
-          visitor_ip: await getVisitorIP(),
+          visitor_ip: visitorInfo.ip,
           user_agent: navigator.userAgent,
           referrer: document.referrer || '直接访问',
           page_url: window.location.href,
           device_type: getDeviceType(),
           browser: getBrowserName(),
-          visit_time: new Date().toISOString()
+          visit_time: new Date().toISOString(),
+          // 地理位置信息
+          country: visitorInfo.country,
+          region: visitorInfo.region,
+          city: visitorInfo.city,
+          visitor_address: address,
+          // 定位方式
+          location_method: visitorInfo.location_method || 'ip',
+          location_accuracy: visitorInfo.accuracy || null
         }
 
         // 插入访客记录
@@ -34,7 +47,12 @@ export const useVisitorTracking = () => {
         if (error) {
           console.error('访客记录失败:', error)
         } else {
-          console.log('访客记录成功')
+          // 显示定位信息
+          if (visitorInfo.location_method === 'gps') {
+            console.log(`✅ 访客记录成功，GPS定位: ${address} (精度: ${Math.round(visitorInfo.accuracy)}米)`)
+          } else {
+            console.log(`✅ 访客记录成功，IP定位: ${address}`)
+          }
         }
       } catch (error) {
         console.error('访客追踪出错:', error)
@@ -46,19 +64,6 @@ export const useVisitorTracking = () => {
 
     return () => clearTimeout(timer)
   }, [])
-}
-
-/**
- * 获取访客 IP 地址（使用第三方服务）
- */
-const getVisitorIP = async () => {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json')
-    const data = await response.json()
-    return data.ip
-  } catch (error) {
-    return '未知'
-  }
 }
 
 /**

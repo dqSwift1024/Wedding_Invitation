@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../config/supabase'
-import { FaCopy, FaCheck, FaDownload, FaEye, FaEyeSlash, FaUsers, FaChartPie, FaChartLine, FaRoute } from 'react-icons/fa'
+import { FaCopy, FaCheck, FaDownload, FaEye, FaEyeSlash, FaUsers, FaChartPie, FaChartLine, FaRoute, FaGlobe } from 'react-icons/fa'
 import PageViewStats from './PageViewStats'
 import GuestJourney from './GuestJourney'
+import GeoDistribution from './GeoDistribution'
 
 /**
  * 宾客管理页面
@@ -14,7 +15,7 @@ const GuestManagement = () => {
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState(null)
   const [filter, setFilter] = useState('all') // all | opened | unopened
-  const [activeTab, setActiveTab] = useState('guests') // guests | pageviews | journey
+  const [activeTab, setActiveTab] = useState('guests') // guests | pageviews | journey | geo
 
   useEffect(() => {
     fetchData()
@@ -119,7 +120,7 @@ const GuestManagement = () => {
       <div className="max-w-7xl mx-auto">
         {/* 标签切换 */}
         <div className="bg-white rounded-2xl shadow-xl p-4 mb-8">
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setActiveTab('guests')}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
@@ -152,6 +153,17 @@ const GuestManagement = () => {
             >
               <FaRoute />
               浏览路径
+            </button>
+            <button
+              onClick={() => setActiveTab('geo')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                activeTab === 'geo'
+                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <FaGlobe />
+              地理分布
             </button>
           </div>
         </div>
@@ -364,6 +376,11 @@ const GuestManagement = () => {
         {/* 浏览路径标签内容 */}
         {activeTab === 'journey' && (
           <GuestJourney />
+        )}
+
+        {/* 地理分布标签内容 */}
+        {activeTab === 'geo' && (
+          <GeoDistribution />
         )}
       </div>
     </div>

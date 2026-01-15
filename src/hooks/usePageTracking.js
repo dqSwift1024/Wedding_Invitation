@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../config/supabase'
+import { getVisitorInfo, formatAddress } from '../utils/ipGeoLocation'
 
 /**
  * 页面浏览追踪 Hook
@@ -53,15 +54,38 @@ export const usePageTracking = (guestId = null, guestName = null) => {
   // 初始化会话
   const initSession = async () => {
     try {
+      // 获取访客IP和地理位置信息
+      const visitorInfo = await getVisitorInfo()
+      const address = formatAddress(visitorInfo)
+
       await supabase.from('visitor_sessions').insert([{
         session_id: sessionIdRef.current,
         guest_id: guestId,
         guest_name: guestName,
         session_start: new Date().toISOString(),
-        visitor_ip: await getVisitorIP(),
+        visitor_ip: visitorInfo.ip,
         device_type: getDeviceType(),
-        browser: getBrowserName()
+        browser: getBrowserName(),
+        // 地理位置信息
+        visitor_country: visitorInfo.country,
+        visitor_region: visitorInfo.region,
+        visitor_city: visitorInfo.city,
+        visitor_address: address,
+        visitor_latitude: visitorInfo.latitude,
+        visitor_longitude: visitorInfo.longitude,
+        visitor_timezone: visitorInfo.timezone,
+        visitor_isp: visitorInfo.isp,
+        // 定位方式
+        location_method: visitorInfo.location_method || 'ip',
+        location_accuracy: visitorInfo.accuracy || null
       }])
+
+      // 显示定位信息
+      if (visitorInfo.location_method === 'gps') {
+        console.log(`📍 GPS定位: ${address} (精度: ${Math.round(visitorInfo.accuracy)}米)`)
+      } else {
+        console.log(`📍 IP定位: ${address}`)
+      }
     } catch (error) {
       console.error('初始化会话失败:', error)
     }
@@ -125,6 +149,14 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     try {
       const scrollDepth = getScrollDepth()
       
+      // 从会话获取访客信息（避免重复获取IP）
+      const { data: sessionData } = await supabase
+        .from('visitor_sessions')
+        .select('visitor_ip, visitor_country, visitor_region, visitor_city, visitor_address, device_type, browser')
+        .eq('session_id', sessionIdRef.current)
+        .single()
+
+      // 插入页面浏览记录
       await supabase.from('page_views').insert([{
         session_id: sessionIdRef.current,
         guest_id: guestId,
@@ -134,44 +166,56 @@ export const usePageTracking = (guestId = null, guestName = null) => {
         scroll_depth: scrollDepth,
         time_spent: timeSpent,
         view_time: new Date().toISOString(),
-        visitor_ip: await getVisitorIP(),
-        device_type: getDeviceType(),
-        browser: getBrowserName()
+        visitor_ip: sessionData?.visitor_ip || '未知',
+        device_type: sessionData?.device_type || getDeviceType(),
+        browser: sessionData?.browser || getBrowserName(),
+        // 地理位置信息
+        visitor_country: sessionData?.visitor_country,
+        visitor_region: sessionData?.visitor_region,
+        visitor_city: sessionData?.visitor_city,
+        visitor_address: sessionData?.visitor_address
       }])
 
-      // 更新会话统计
-      await updateSessionStats(section)
+      // 更新会话统计（在插入之后）
+      await updateSessionStats(section, scrollDepth)
 
-      console.log(`📄 记录页面浏览: ${section}, 停留 ${timeSpent}秒`)
+      console.log(`📄 记录页面浏览: ${section}, 停留 ${timeSpent}秒, 滚动 ${scrollDepth}%`)
     } catch (error) {
       console.error('记录页面浏览失败:', error)
     }
   }
 
   // 更新会话统计
-  const updateSessionStats = async (newSection) => {
+  const updateSessionStats = async (newSection, newScrollDepth) => {
     try {
-      // 获取当前会话的浏览记录
+      // 获取当前会话的所有浏览记录
       const { data: pageViews } = await supabase
         .from('page_views')
         .select('page_section, scroll_depth')
         .eq('session_id', sessionIdRef.current)
 
+      // 计算唯一页面数（包括新添加的）
       const uniquePages = new Set(pageViews?.map(v => v.page_section) || [])
-      uniquePages.add(newSection)
+      const pagesViewedCount = uniquePages.size
 
-      const maxScrollDepth = Math.max(
-        ...pageViews?.map(v => v.scroll_depth || 0) || [0],
-        getScrollDepth()
-      )
+      // 计算最大滚动深度
+      const allScrollDepths = pageViews?.map(v => v.scroll_depth || 0) || []
+      const maxScrollDepth = Math.max(...allScrollDepths, newScrollDepth || 0)
 
-      await supabase
+      // 更新会话统计
+      const { error } = await supabase
         .from('visitor_sessions')
         .update({
-          pages_viewed: uniquePages.size,
+          pages_viewed: pagesViewedCount,
           max_scroll_depth: maxScrollDepth
         })
         .eq('session_id', sessionIdRef.current)
+
+      if (error) {
+        console.error('更新会话统计错误:', error)
+      } else {
+        console.log(`📊 会话统计更新: ${pagesViewedCount}个页面, 最大滚动${maxScrollDepth}%`)
+      }
     } catch (error) {
       console.error('更新会话统计失败:', error)
     }
@@ -246,19 +290,6 @@ const getScrollDepth = () => {
   )
   
   return scrollDepth
-}
-
-/**
- * 获取访客 IP 地址
- */
-const getVisitorIP = async () => {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json')
-    const data = await response.json()
-    return data.ip
-  } catch (error) {
-    return '未知'
-  }
 }
 
 /**
