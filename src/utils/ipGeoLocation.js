@@ -313,14 +313,14 @@ const reverseGeocode = async (latitude, longitude) => {
 }
 
 /**
- * 获取完整的访客信息（优先GPS，备选IP）
- * @param {boolean} forceIP - 是否强制使用IP定位（跳过GPS）
+ * 获取完整的访客信息（仅使用IP定位，避免权限提示）
+ * @param {boolean} enableGPS - 是否启用GPS定位（默认禁用）
  * @returns {Promise<Object>} 包含IP和地理位置的对象
  */
-export const getVisitorInfo = async (forceIP = false) => {
+export const getVisitorInfo = async (enableGPS = false) => {
   try {
-    // 优先尝试GPS定位（除非强制使用IP）
-    if (!forceIP) {
+    // 只有明确启用GPS时才尝试（默认禁用，避免权限提示）
+    if (enableGPS) {
       const gpsLocation = await getGPSLocation()
       
       if (gpsLocation) {
@@ -335,8 +335,7 @@ export const getVisitorInfo = async (forceIP = false) => {
       }
     }
 
-    // GPS定位失败或被跳过，使用IP定位
-    console.log('📡 使用IP地址定位...')
+    // 使用IP定位（默认方式）
     const ip = await getVisitorIP()
     const geoLocation = ip !== '未知' ? await getGeoLocation(ip) : await getGeoLocation()
 

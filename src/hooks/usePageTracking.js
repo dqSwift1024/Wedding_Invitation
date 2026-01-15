@@ -157,7 +157,7 @@ export const usePageTracking = (guestId = null, guestName = null) => {
         .single()
 
       // 插入页面浏览记录
-      await supabase.from('page_views').insert([{
+      const { error: insertError } = await supabase.from('page_views').insert([{
         session_id: sessionIdRef.current,
         guest_id: guestId,
         guest_name: guestName,
@@ -176,10 +176,19 @@ export const usePageTracking = (guestId = null, guestName = null) => {
         visitor_address: sessionData?.visitor_address
       }])
 
+      if (insertError) {
+        console.error('插入页面浏览记录失败:', insertError)
+        return
+      }
+
+      console.log(`📄 记录页面浏览: ${section}, 停留 ${timeSpent}秒, 滚动 ${scrollDepth}%`)
+
+      // 等待一小段时间确保数据库写入完成
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       // 更新会话统计（在插入之后）
       await updateSessionStats(section, scrollDepth)
 
-      console.log(`📄 记录页面浏览: ${section}, 停留 ${timeSpent}秒, 滚动 ${scrollDepth}%`)
     } catch (error) {
       console.error('记录页面浏览失败:', error)
     }
@@ -189,12 +198,17 @@ export const usePageTracking = (guestId = null, guestName = null) => {
   const updateSessionStats = async (newSection, newScrollDepth) => {
     try {
       // 获取当前会话的所有浏览记录
-      const { data: pageViews } = await supabase
+      const { data: pageViews, error: queryError } = await supabase
         .from('page_views')
         .select('page_section, scroll_depth')
         .eq('session_id', sessionIdRef.current)
 
-      // 计算唯一页面数（包括新添加的）
+      if (queryError) {
+        console.error('查询页面浏览记录失败:', queryError)
+        return
+      }
+
+      // 计算唯一页面数
       const uniquePages = new Set(pageViews?.map(v => v.page_section) || [])
       const pagesViewedCount = uniquePages.size
 
@@ -202,8 +216,10 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       const allScrollDepths = pageViews?.map(v => v.scroll_depth || 0) || []
       const maxScrollDepth = Math.max(...allScrollDepths, newScrollDepth || 0)
 
+      console.log(`📊 准备更新会话统计: 页面数=${pagesViewedCount}, 最大滚动=${maxScrollDepth}%`)
+
       // 更新会话统计
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('visitor_sessions')
         .update({
           pages_viewed: pagesViewedCount,
@@ -211,17 +227,17 @@ export const usePageTracking = (guestId = null, guestName = null) => {
         })
         .eq('session_id', sessionIdRef.current)
 
-      if (error) {
-        console.error('更新会话统计错误:', error)
+      if (updateError) {
+        console.error('更新会话统计错误:', updateError)
       } else {
-        console.log(`📊 会话统计更新: ${pagesViewedCount}个页面, 最大滚动${maxScrollDepth}%`)
+        console.log(`✅ 会话统计已更新: ${pagesViewedCount}个页面, 最大滚动${maxScrollDepth}%`)
       }
     } catch (error) {
       console.error('更新会话统计失败:', error)
     }
   }
 
-  // 更新会话时长
+  // 更新会话时长和统计
   const updateSessionDuration = async () => {
     if (!sessionIdRef.current) return
 
@@ -237,10 +253,26 @@ export const usePageTracking = (guestId = null, guestName = null) => {
           (Date.now() - new Date(session.session_start).getTime()) / 1000
         )
 
+        // 同时更新时长和统计
+        const { data: pageViews } = await supabase
+          .from('page_views')
+          .select('page_section, scroll_depth')
+          .eq('session_id', sessionIdRef.current)
+
+        const uniquePages = new Set(pageViews?.map(v => v.page_section) || [])
+        const allScrollDepths = pageViews?.map(v => v.scroll_depth || 0) || []
+        const maxScrollDepth = allScrollDepths.length > 0 ? Math.max(...allScrollDepths) : 0
+
         await supabase
           .from('visitor_sessions')
-          .update({ total_duration: duration })
+          .update({ 
+            total_duration: duration,
+            pages_viewed: uniquePages.size,
+            max_scroll_depth: maxScrollDepth
+          })
           .eq('session_id', sessionIdRef.current)
+
+        console.log(`🔄 定期更新: 时长${duration}秒, ${uniquePages.size}个页面, 最大滚动${maxScrollDepth}%`)
       }
     } catch (error) {
       console.error('更新会话时长失败:', error)
@@ -257,14 +289,30 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       await recordPageView(currentSection, timeSpent)
     }
 
-    // 更新会话结束时间
+    // 等待插入完成
+    await new Promise(resolve => setTimeout(resolve, 200))
+
+    // 更新会话结束时间和最终统计
     try {
+      const { data: pageViews } = await supabase
+        .from('page_views')
+        .select('page_section, scroll_depth')
+        .eq('session_id', sessionIdRef.current)
+
+      const uniquePages = new Set(pageViews?.map(v => v.page_section) || [])
+      const allScrollDepths = pageViews?.map(v => v.scroll_depth || 0) || []
+      const maxScrollDepth = allScrollDepths.length > 0 ? Math.max(...allScrollDepths) : 0
+
       await supabase
         .from('visitor_sessions')
         .update({
-          session_end: new Date().toISOString()
+          session_end: new Date().toISOString(),
+          pages_viewed: uniquePages.size,
+          max_scroll_depth: maxScrollDepth
         })
         .eq('session_id', sessionIdRef.current)
+
+      console.log(`🏁 会话结束: ${uniquePages.size}个页面, 最大滚动${maxScrollDepth}%`)
     } catch (error) {
       console.error('结束会话失败:', error)
     }
