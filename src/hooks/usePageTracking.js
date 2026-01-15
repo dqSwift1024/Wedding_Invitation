@@ -9,7 +9,7 @@ import { getVisitorInfo, formatAddress } from '../utils/ipGeoLocation'
 export const usePageTracking = (guestId = null, guestName = null) => {
   const sessionIdRef = useRef(null)
   const pageStartTimeRef = useRef({})
-  const [currentSection, setCurrentSection] = useState(null)
+  const currentSectionRef = useRef(null) // 改用 ref，避免闭包问题
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -41,20 +41,21 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       trackVisibleSection()
     }, 1000) // 延迟1秒，确保DOM加载完成
 
-    // 定期追踪（每3秒检查一次，确保不漏掉任何区域）
+    // 定期追踪（每5秒检查一次，确保不漏掉任何区域）
     const trackingInterval = setInterval(() => {
       trackVisibleSection()
-    }, 2000)
+    }, 5000)
 
     // 定期保存当前区域（每10秒保存一次，确保长时间停留也被记录）
     const saveCurrentInterval = setInterval(() => {
-      if (currentSection && pageStartTimeRef.current[currentSection]) {
-        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSection]) / 1000)
+      const current = currentSectionRef.current
+      if (current && pageStartTimeRef.current[current]) {
+        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[current]) / 1000)
         if (timeSpent >= 10) { // 只记录停留超过10秒的
-          console.log(`💾 定期保存: ${currentSection}, 已停留${timeSpent}秒`)
-          recordPageView(currentSection, timeSpent)
+          console.log(`💾 定期保存: ${current}, 已停留${timeSpent}秒`)
+          recordPageView(current, timeSpent)
           // 重置计时器，避免重复记录
-          pageStartTimeRef.current[currentSection] = Date.now()
+          pageStartTimeRef.current[current] = Date.now()
         }
       }
     }, 10000) // 每10秒保存一次
@@ -159,18 +160,18 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     }
 
     // 如果切换到新区域
-    if (visibleSection && visibleSection !== currentSection) {
+    if (visibleSection && visibleSection !== currentSectionRef.current) {
       // 记录上一个区域的停留时间
-      if (currentSection && pageStartTimeRef.current[currentSection]) {
-        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSection]) / 1000)
-        console.log(`🔄 区域切换: ${currentSection} → ${visibleSection} (停留了${timeSpent}秒)`)
-        recordPageView(currentSection, timeSpent)
+      if (currentSectionRef.current && pageStartTimeRef.current[currentSectionRef.current]) {
+        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSectionRef.current]) / 1000)
+        console.log(`🔄 区域切换: ${currentSectionRef.current} → ${visibleSection} (停留了${timeSpent}秒)`)
+        recordPageView(currentSectionRef.current, timeSpent)
       } else {
         console.log(`👁️ 首次进入区域: ${visibleSection}`)
       }
 
       // 开始记录新区域
-      setCurrentSection(visibleSection)
+      currentSectionRef.current = visibleSection
       pageStartTimeRef.current[visibleSection] = Date.now()
     }
   }
@@ -332,9 +333,10 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     if (!sessionIdRef.current) return
 
     // 记录最后一个区域
-    if (currentSection && pageStartTimeRef.current[currentSection]) {
-      const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSection]) / 1000)
-      await recordPageView(currentSection, timeSpent)
+    const current = currentSectionRef.current
+    if (current && pageStartTimeRef.current[current]) {
+      const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[current]) / 1000)
+      await recordPageView(current, timeSpent)
     }
 
     // 等待插入完成
@@ -367,7 +369,7 @@ export const usePageTracking = (guestId = null, guestName = null) => {
   }
 
   return {
-    currentSection,
+    currentSection: currentSectionRef.current, // 返回当前值（不会触发重新渲染）
     sessionId: sessionIdRef.current
   }
 }

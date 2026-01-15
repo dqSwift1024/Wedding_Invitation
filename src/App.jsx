@@ -23,7 +23,7 @@ function App() {
   const { guest, loading } = useGuestTracking()
   
   // 追踪页面浏览（传入宾客信息）
-  const { currentSection } = usePageTracking(guest?.guest_id, guest?.guest_name)
+  usePageTracking(guest?.guest_id, guest?.guest_name)
 
   // 加载中状态
   if (loading) {
@@ -87,12 +87,6 @@ function App() {
           </p>
           {guest.guest_group && (
             <p className="text-xs text-gray-400">{guest.guest_group}</p>
-          )}
-          {/* 显示当前浏览区域（调试用，可选） */}
-          {currentSection && (
-            <p className="text-xs text-gray-300 mt-1">
-              正在浏览: {currentSection}
-            </p>
           )}
         </div>
       )}
