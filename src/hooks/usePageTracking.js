@@ -10,6 +10,8 @@ export const usePageTracking = (guestId = null, guestName = null) => {
   const sessionIdRef = useRef(null)
   const pageStartTimeRef = useRef({})
   const currentSectionRef = useRef(null) // 改用 ref，避免闭包问题
+  const pausedTimeRef = useRef({}) // 存储每个区域暂停时的累积时间
+  const intervalsRef = useRef({}) // 存储定时器引用，以便暂停/恢复
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -32,46 +34,29 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       endSession()
     }
 
+    // 监听页面可见性变化（切换标签页、息屏等）
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // 页面隐藏：暂停计时
+        handlePageHidden()
+      } else {
+        // 页面显示：恢复计时
+        handlePageVisible()
+      }
+    }
+
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
-    // 延迟初始追踪，确保DOM完全渲染
-    const initialTrackTimeout = setTimeout(() => {
-      console.log('🔍 开始追踪页面浏览...')
-      trackVisibleSection()
-    }, 1000) // 延迟1秒，确保DOM加载完成
-
-    // 定期追踪（每5秒检查一次，确保不漏掉任何区域）
-    const trackingInterval = setInterval(() => {
-      trackVisibleSection()
-    }, 5000)
-
-    // 定期保存当前区域（每10秒保存一次，确保长时间停留也被记录）
-    const saveCurrentInterval = setInterval(() => {
-      const current = currentSectionRef.current
-      if (current && pageStartTimeRef.current[current]) {
-        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[current]) / 1000)
-        if (timeSpent >= 10) { // 只记录停留超过10秒的
-          console.log(`💾 定期保存: ${current}, 已停留${timeSpent}秒`)
-          recordPageView(current, timeSpent)
-          // 重置计时器，避免重复记录
-          pageStartTimeRef.current[current] = Date.now()
-        }
-      }
-    }, 10000) // 每10秒保存一次
-
-    // 定期更新会话信息
-    const sessionUpdateInterval = setInterval(() => {
-      updateSessionDuration()
-    }, 30000) // 每30秒更新一次
+    // 启动所有定时器
+    startAllIntervals()
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      clearTimeout(initialTrackTimeout)
-      clearInterval(trackingInterval)
-      clearInterval(saveCurrentInterval)
-      clearInterval(sessionUpdateInterval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      stopAllIntervals()
       endSession()
     }
   }, [guestId, guestName])
@@ -366,6 +351,96 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     } catch (error) {
       console.error('结束会话失败:', error)
     }
+  }
+
+  // 启动所有定时器
+  const startAllIntervals = () => {
+    // 延迟初始追踪，确保DOM完全渲染
+    intervalsRef.current.initialTrack = setTimeout(() => {
+      console.log('🔍 开始追踪页面浏览...')
+      trackVisibleSection()
+    }, 1000)
+
+    // 定期追踪（每5秒检查一次）
+    intervalsRef.current.tracking = setInterval(() => {
+      trackVisibleSection()
+    }, 5000)
+
+    // 定期保存当前区域（每10秒保存一次）
+    intervalsRef.current.saveCheck = setInterval(() => {
+      const current = currentSectionRef.current
+      if (current && pageStartTimeRef.current[current]) {
+        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[current]) / 1000)
+        if (timeSpent >= 10) {
+          console.log(`💾 定期保存: ${current}, 已停留${timeSpent}秒`)
+          recordPageView(current, timeSpent)
+          // 重置计时器，避免重复记录
+          pageStartTimeRef.current[current] = Date.now()
+        }
+      }
+    }, 10000)
+
+    // 定期更新会话信息（每30秒）
+    intervalsRef.current.sessionUpdate = setInterval(() => {
+      updateSessionDuration()
+    }, 30000)
+  }
+
+  // 停止所有定时器
+  const stopAllIntervals = () => {
+    if (intervalsRef.current.initialTrack) {
+      clearTimeout(intervalsRef.current.initialTrack)
+    }
+    if (intervalsRef.current.tracking) {
+      clearInterval(intervalsRef.current.tracking)
+    }
+    if (intervalsRef.current.saveCheck) {
+      clearInterval(intervalsRef.current.saveCheck)
+    }
+    if (intervalsRef.current.sessionUpdate) {
+      clearInterval(intervalsRef.current.sessionUpdate)
+    }
+  }
+
+  // 页面隐藏时的处理（切换标签页、息屏等）
+  const handlePageHidden = () => {
+    const current = currentSectionRef.current
+    
+    if (current && pageStartTimeRef.current[current]) {
+      // 计算当前区域的停留时间
+      const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[current]) / 1000)
+      
+      // 如果停留时间超过3秒，记录到数据库
+      if (timeSpent >= 3) {
+        console.log(`⏸️ 页面隐藏: 保存 ${current}, 停留 ${timeSpent}秒`)
+        recordPageView(current, timeSpent)
+      }
+      
+      // 保存已停留的时间（用于后续累加）
+      pausedTimeRef.current[current] = (pausedTimeRef.current[current] || 0) + timeSpent
+      
+      // 清除计时起点
+      delete pageStartTimeRef.current[current]
+    }
+
+    // 停止所有定时器
+    stopAllIntervals()
+    
+    console.log('⏸️ 页面已隐藏，计时暂停')
+  }
+
+  // 页面显示时的处理（重新进入标签页、亮屏等）
+  const handlePageVisible = () => {
+    const current = currentSectionRef.current
+    
+    // 重新开始当前区域的计时
+    if (current) {
+      pageStartTimeRef.current[current] = Date.now()
+      console.log(`▶️ 页面可见，恢复计时: ${current}`)
+    }
+
+    // 重启所有定时器
+    startAllIntervals()
   }
 
   return {
