@@ -17,7 +17,7 @@ export default async (request, context) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ming & Xin 婚礼请柬</title>
+  <title>Huan & Xu 婚礼请柬</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -215,10 +215,10 @@ export default async (request, context) => {
   
   <div class="container">
     <div class="icon">💌</div>
-    <h1>Ming & Xin</h1>
+    <h1>Huan & Xu</h1>
     <div class="subtitle">
       婚礼请柬<br>
-      2025.10.20
+      2026.02.22
     </div>
     
     <div class="steps">

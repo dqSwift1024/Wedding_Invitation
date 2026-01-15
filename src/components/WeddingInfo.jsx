@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaPalette } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaPalette, FaLocationArrow } from 'react-icons/fa'
 
 const WeddingInfo = () => {
   const ref = useRef(null)
@@ -39,41 +39,44 @@ const WeddingInfo = () => {
         </motion.div>
 
         <div className="space-y-8">
-          {/* 仪式时间 */}
+          {/* 婚礼时间（仪式+宴席） */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="bg-white rounded-2xl shadow-xl p-8"
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 mb-6">
               <div className="bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 p-4 rounded-xl">
                 <FaCalendarAlt className="text-white text-2xl" />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">仪式时间</h3>
-                <p className="text-gray-700 text-lg mb-1">2025年10月20日 上午10:00</p>
-                <p className="text-gray-500">Ceremony Time</p>
+                <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">婚礼时间</h3>
+                <p className="text-gray-500">Wedding Schedule</p>
               </div>
             </div>
-          </motion.div>
-
-          {/* 宴席时间 */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="bg-white rounded-2xl shadow-xl p-8"
-          >
-            <div className="flex items-start gap-4">
-              <div className="bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 p-4 rounded-xl">
-                <FaClock className="text-white text-2xl" />
+            <div className="grid md:grid-cols-2 gap-6 ml-4 md:ml-16">
+              <div className="flex items-start gap-3">
+                <div className="bg-rose-gold-100 p-3 rounded-lg">
+                  <FaCalendarAlt className="text-rose-gold-600 text-lg" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm mb-1">仪式时间</p>
+                  <p className="text-gray-800 text-lg font-semibold">上午 08:08</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">宴席时间</h3>
-                <p className="text-gray-700 text-lg mb-1">2025年10月20日 中午12:00</p>
-                <p className="text-gray-500">Reception Time</p>
+              <div className="flex items-start gap-3">
+                <div className="bg-rose-gold-100 p-3 rounded-lg">
+                  <FaClock className="text-rose-gold-600 text-lg" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm mb-1">宴席时间</p>
+                  <p className="text-gray-800 text-lg font-semibold">中午 12:00</p>
+                </div>
               </div>
+            </div>
+            <div className="mt-4 ml-4 md:ml-16 text-gray-600">
+              <p className="text-sm">📅 2026年2月22日 星期日</p>
             </div>
           </motion.div>
 
@@ -81,10 +84,10 @@ const WeddingInfo = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="bg-white rounded-2xl shadow-xl p-8"
           >
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex items-start gap-4 mb-6">
               <div className="bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 p-4 rounded-xl">
                 <FaMapMarkerAlt className="text-white text-2xl" />
               </div>
@@ -94,31 +97,36 @@ const WeddingInfo = () => {
                 <p className="text-gray-500">Wedding Venue</p>
               </div>
             </div>
-            <div className="flex gap-4 mt-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => openMap('gaode')}
-                className="flex-1 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-shadow"
-              >
-                高德地图
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => openMap('baidu')}
-                className="flex-1 bg-gradient-to-r from-rose-gold-500 to-rose-gold-700 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-shadow"
-              >
-                百度地图
-              </motion.button>
+            
+            {/* 地图图片 */}
+            <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
+              <img 
+                src="https://api.map.baidu.com/staticimage/v2?ak=YOUR_BAIDU_MAP_AK&center=116.397428,39.90923&width=600&height=300&zoom=16&markers=116.397428,39.90923&markerStyles=l,A"
+                alt="婚礼地址地图"
+                className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/600x300/f9a8d4/ffffff?text=地图加载中...'
+                }}
+              />
             </div>
+            
+            {/* 导航按钮 */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => openMap('gaode')}
+              className="w-full bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white py-4 rounded-xl font-medium hover:shadow-xl transition-all flex items-center justify-center gap-3 text-lg"
+            >
+              <FaLocationArrow className="text-xl" />
+              打开导航
+            </motion.button>
           </motion.div>
 
           {/* Dress Code */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
             className="bg-white rounded-2xl shadow-xl p-8"
           >
             <div className="flex items-center gap-4 mb-6">
@@ -139,7 +147,7 @@ const WeddingInfo = () => {
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+                  transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
                   whileHover={{ scale: 1.05 }}
                   className={`${item.color} rounded-xl p-4 text-center shadow-md`}
                 >

@@ -78,18 +78,6 @@ function App() {
       <div id="footer" data-section="Footer">
         <Footer />
       </div>
-      
-      {/* 显示访客信息角标 */}
-      {guest && (
-        <div className="fixed top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2 z-50 border-2 border-rose-200">
-          <p className="text-sm text-gray-600">
-            欢迎您，<span className="font-bold text-rose-600">{guest.guest_name}</span>
-          </p>
-          {guest.guest_group && (
-            <p className="text-xs text-gray-400">{guest.guest_group}</p>
-          )}
-        </div>
-      )}
     </div>
   )
 }

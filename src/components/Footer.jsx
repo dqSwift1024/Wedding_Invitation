@@ -52,7 +52,7 @@ const Footer = () => {
             className="border-t border-gray-200 pt-8"
           >
             <p className="text-gray-400 text-sm mb-2">
-              Made with <FaHeart className="inline text-rose-gold-400" /> by Ming & Xin
+              Made with <FaHeart className="inline text-rose-gold-400" /> by Huan & Xu
             </p>
             <button
               onClick={() => setShowCopyright(false)}

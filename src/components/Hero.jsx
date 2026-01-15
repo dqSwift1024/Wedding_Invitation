@@ -64,7 +64,7 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
           className="mb-8"
         >
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gradient mb-4 font-elegant">
-            Ming
+            Huan
           </h1>
           <motion.div
             initial={{ width: 0 }}
@@ -74,7 +74,7 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
             style={{ maxWidth: '200px' }}
           />
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gradient font-elegant">
-            & Xin
+            & Xu
           </h1>
         </motion.div>
 
@@ -84,7 +84,7 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
           transition={{ duration: 1, delay: 1.2 }}
           className="text-xl md:text-2xl text-rose-gold-600 mb-4 font-light tracking-wider"
         >
-          2025.10.20
+          2026.02.22
         </motion.p>
 
         {/* 个性化邀请文案 */}
