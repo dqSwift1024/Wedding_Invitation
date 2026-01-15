@@ -12,6 +12,7 @@ export const usePageTracking = (guestId = null, guestName = null) => {
   const currentSectionRef = useRef(null) // 改用 ref，避免闭包问题
   const pausedTimeRef = useRef({}) // 存储每个区域暂停时的累积时间
   const intervalsRef = useRef({}) // 存储定时器引用，以便暂停/恢复
+  const isPausedRef = useRef(false) // 跟踪是否已暂停，避免重复触发
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -45,17 +46,69 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       }
     }
 
+    // 监听页面隐藏（移动端兼容：切换APP、锁屏）
+    const handlePageHide = (e) => {
+      console.log('📱 pagehide 事件触发')
+      handlePageHidden()
+    }
+
+    // 监听页面显示（移动端兼容：回到APP、解锁）
+    const handlePageShow = (e) => {
+      // persisted 表示页面是从缓存中恢复的
+      if (e.persisted || !document.hidden) {
+        console.log('📱 pageshow 事件触发')
+        handlePageVisible()
+      }
+    }
+
+    // 监听窗口失去焦点（额外保险，移动端备用）
+    const handleBlur = () => {
+      // 延迟检查，避免误触发（如弹出软键盘）
+      setTimeout(() => {
+        if (document.hidden) {
+          console.log('📱 blur + hidden 事件触发')
+          handlePageHidden()
+        }
+      }, 100)
+    }
+
+    // 监听窗口获得焦点（额外保险，移动端备用）
+    const handleFocus = () => {
+      if (!document.hidden) {
+        console.log('📱 focus 事件触发')
+        handlePageVisible()
+      }
+    }
+
+    // 添加所有事件监听器
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('beforeunload', handleBeforeUnload)
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // 移动端专用事件
+    window.addEventListener('pagehide', handlePageHide, { capture: true })
+    window.addEventListener('pageshow', handlePageShow, { capture: true })
+    window.addEventListener('blur', handleBlur)
+    window.addEventListener('focus', handleFocus)
 
-    // 启动所有定时器
-    startAllIntervals()
+    // 检查初始状态：如果页面已经隐藏，不启动定时器
+    if (document.hidden) {
+      console.log('⚠️ 页面初始状态为隐藏，不启动追踪')
+      isPausedRef.current = true
+    } else {
+      // 启动所有定时器
+      startAllIntervals()
+      isPausedRef.current = false
+    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('pagehide', handlePageHide, { capture: true })
+      window.removeEventListener('pageshow', handlePageShow, { capture: true })
+      window.removeEventListener('blur', handleBlur)
+      window.removeEventListener('focus', handleFocus)
       stopAllIntervals()
       endSession()
     }
@@ -404,6 +457,13 @@ export const usePageTracking = (guestId = null, guestName = null) => {
 
   // 页面隐藏时的处理（切换标签页、息屏等）
   const handlePageHidden = () => {
+    // 防止重复触发
+    if (isPausedRef.current) {
+      console.log('⚠️ 已经暂停，跳过重复触发')
+      return
+    }
+
+    isPausedRef.current = true
     const current = currentSectionRef.current
     
     if (current && pageStartTimeRef.current[current]) {
@@ -431,6 +491,13 @@ export const usePageTracking = (guestId = null, guestName = null) => {
 
   // 页面显示时的处理（重新进入标签页、亮屏等）
   const handlePageVisible = () => {
+    // 防止重复触发
+    if (!isPausedRef.current) {
+      console.log('⚠️ 未暂停，跳过恢复触发')
+      return
+    }
+
+    isPausedRef.current = false
     const current = currentSectionRef.current
     
     // 重新开始当前区域的计时
