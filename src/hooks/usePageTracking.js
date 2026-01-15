@@ -35,8 +35,29 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('beforeunload', handleBeforeUnload)
 
-    // 初始追踪
-    trackVisibleSection()
+    // 延迟初始追踪，确保DOM完全渲染
+    const initialTrackTimeout = setTimeout(() => {
+      console.log('🔍 开始追踪页面浏览...')
+      trackVisibleSection()
+    }, 1000) // 延迟1秒，确保DOM加载完成
+
+    // 定期追踪（每3秒检查一次，确保不漏掉任何区域）
+    const trackingInterval = setInterval(() => {
+      trackVisibleSection()
+    }, 2000)
+
+    // 定期保存当前区域（每10秒保存一次，确保长时间停留也被记录）
+    const saveCurrentInterval = setInterval(() => {
+      if (currentSection && pageStartTimeRef.current[currentSection]) {
+        const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSection]) / 1000)
+        if (timeSpent >= 10) { // 只记录停留超过10秒的
+          console.log(`💾 定期保存: ${currentSection}, 已停留${timeSpent}秒`)
+          recordPageView(currentSection, timeSpent)
+          // 重置计时器，避免重复记录
+          pageStartTimeRef.current[currentSection] = Date.now()
+        }
+      }
+    }, 10000) // 每10秒保存一次
 
     // 定期更新会话信息
     const sessionUpdateInterval = setInterval(() => {
@@ -46,6 +67,9 @@ export const usePageTracking = (guestId = null, guestName = null) => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('beforeunload', handleBeforeUnload)
+      clearTimeout(initialTrackTimeout)
+      clearInterval(trackingInterval)
+      clearInterval(saveCurrentInterval)
       clearInterval(sessionUpdateInterval)
       endSession()
     }
@@ -106,12 +130,14 @@ export const usePageTracking = (guestId = null, guestName = null) => {
 
     let visibleSection = null
     let maxVisibility = 0
+    let foundElements = 0
 
     sections.forEach(section => {
       const element = document.getElementById(section.id) || 
                      document.querySelector(`[data-section="${section.name}"]`)
       
       if (element) {
+        foundElements++
         const rect = element.getBoundingClientRect()
         const windowHeight = window.innerHeight
         
@@ -126,12 +152,21 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       }
     })
 
+    // 调试：如果没有找到任何元素，输出警告
+    if (foundElements === 0 && sessionIdRef.current) {
+      console.warn('⚠️ 未找到任何页面区域元素！请检查元素的 id 或 data-section 属性')
+      console.log('尝试查找的区域:', sections.map(s => `#${s.id} 或 [data-section="${s.name}"]`).join(', '))
+    }
+
     // 如果切换到新区域
     if (visibleSection && visibleSection !== currentSection) {
       // 记录上一个区域的停留时间
       if (currentSection && pageStartTimeRef.current[currentSection]) {
         const timeSpent = Math.floor((Date.now() - pageStartTimeRef.current[currentSection]) / 1000)
+        console.log(`🔄 区域切换: ${currentSection} → ${visibleSection} (停留了${timeSpent}秒)`)
         recordPageView(currentSection, timeSpent)
+      } else {
+        console.log(`👁️ 首次进入区域: ${visibleSection}`)
       }
 
       // 开始记录新区域
@@ -142,22 +177,35 @@ export const usePageTracking = (guestId = null, guestName = null) => {
 
   // 记录页面浏览
   const recordPageView = async (section, timeSpent) => {
-    if (!isSupabaseConfigured() || !sessionIdRef.current) {
+    if (!isSupabaseConfigured()) {
+      console.warn('⚠️ Supabase 未配置，跳过记录')
+      return
+    }
+
+    if (!sessionIdRef.current) {
+      console.warn('⚠️ 会话ID不存在，跳过记录')
       return
     }
 
     try {
       const scrollDepth = getScrollDepth()
       
+      console.log(`📝 准备记录: ${section}, 停留${timeSpent}秒, 滚动${scrollDepth}%`)
+
       // 从会话获取访客信息（避免重复获取IP）
-      const { data: sessionData } = await supabase
+      const { data: sessionData, error: sessionError } = await supabase
         .from('visitor_sessions')
         .select('visitor_ip, visitor_country, visitor_region, visitor_city, visitor_address, device_type, browser')
         .eq('session_id', sessionIdRef.current)
         .single()
 
+      if (sessionError) {
+        console.error('查询会话数据失败:', sessionError)
+        // 继续使用默认值
+      }
+
       // 插入页面浏览记录
-      const { error: insertError } = await supabase.from('page_views').insert([{
+      const { error: insertError, data: insertData } = await supabase.from('page_views').insert([{
         session_id: sessionIdRef.current,
         guest_id: guestId,
         guest_name: guestName,
@@ -177,11 +225,11 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       }])
 
       if (insertError) {
-        console.error('插入页面浏览记录失败:', insertError)
+        console.error('❌ 插入页面浏览记录失败:', insertError)
         return
       }
 
-      console.log(`📄 记录页面浏览: ${section}, 停留 ${timeSpent}秒, 滚动 ${scrollDepth}%`)
+      console.log(`✅ 记录成功: ${section}, 停留 ${timeSpent}秒, 滚动 ${scrollDepth}%`)
 
       // 等待一小段时间确保数据库写入完成
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -190,7 +238,7 @@ export const usePageTracking = (guestId = null, guestName = null) => {
       await updateSessionStats(section, scrollDepth)
 
     } catch (error) {
-      console.error('记录页面浏览失败:', error)
+      console.error('❌ 记录页面浏览失败:', error)
     }
   }
 
