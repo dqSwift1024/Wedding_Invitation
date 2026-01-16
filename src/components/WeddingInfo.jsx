@@ -92,15 +92,15 @@ const WeddingInfo = () => {
             </div>
             
             {/* 地图图片 */}
-            <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
-              <img 
-                src="https://api.map.baidu.com/staticimage/v2?ak=YOUR_BAIDU_MAP_AK&center=115.032,31.182&width=600&height=300&zoom=16&markers=115.032,31.182&markerStyles=l,A"
-                alt="婚礼地址地图"
-                className="w-full h-64 object-cover"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/600x300/f9a8d4/ffffff?text=地图加载中...'
-                }}
-              />
+            <div className="mb-6 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-rose-gold-50 to-rose-gold-100">
+              <iframe
+                src="https://uri.amap.com/marker?position=115.032,31.182&name=湖北省麻城市白果镇白果宾馆&src=wedding&coordinate=gaode&callnative=0"
+                width="100%"
+                height="256"
+                frameBorder="0"
+                className="w-full h-64"
+                title="婚礼地址地图"
+              ></iframe>
             </div>
             
             {/* 导航按钮 */}
