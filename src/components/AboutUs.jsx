@@ -43,26 +43,6 @@ const AboutUs = () => {
           >
             <div className="relative mb-6 overflow-hidden rounded-2xl shadow-xl">
               <img
-                src="/images/groom.jpg"
-                alt="新郎"
-                className="w-full h-auto object-cover"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/400x600/f9a8d4/ffffff?text=新郎'
-                }}
-              />
-            </div>
-            <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Huan</h3>
-            <p className="text-gray-600">温柔体贴，热爱生活</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center"
-          >
-            <div className="relative mb-6 overflow-hidden rounded-2xl shadow-xl">
-              <img
                 src="/images/bride.jpg"
                 alt="新娘"
                 className="w-full h-auto object-cover"
@@ -73,6 +53,26 @@ const AboutUs = () => {
             </div>
             <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Xu</h3>
             <p className="text-gray-600">美丽善良，充满活力</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center"
+          >
+            <div className="relative mb-6 overflow-hidden rounded-2xl shadow-xl">
+              <img
+                src="/images/groom.jpg"
+                alt="新郎"
+                className="w-full h-auto object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/400x600/f9a8d4/ffffff?text=新郎'
+                }}
+              />
+            </div>
+            <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Huan</h3>
+            <p className="text-gray-600">温柔体贴，热爱生活</p>
           </motion.div>
         </div>
 
