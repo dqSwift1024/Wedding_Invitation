@@ -1,19 +1,26 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaLocationArrow } from 'react-icons/fa'
 
 const WeddingInfo = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const [showMapSelector, setShowMapSelector] = useState(false)
 
   const openMap = (type) => {
     const address = encodeURIComponent('湖北省麻城市白果镇白果宾馆')
+    const lat = 31.182
+    const lng = 115.032
+    
     if (type === 'gaode') {
-      window.open(`https://uri.amap.com/marker?position=115.032,31.182&name=${address}`)
-    } else {
-      window.open(`https://api.map.baidu.com/marker?location=31.182,115.032&title=${address}&content=${address}&output=html`)
+      window.open(`https://uri.amap.com/marker?position=${lng},${lat}&name=${address}`)
+    } else if (type === 'baidu') {
+      window.open(`https://api.map.baidu.com/marker?location=${lat},${lng}&title=${address}&content=${address}&output=html`)
+    } else if (type === 'tencent') {
+      window.open(`https://apis.map.qq.com/uri/v1/marker?marker=coord:${lat},${lng};title:白果宾馆;addr:${address}`)
     }
+    setShowMapSelector(false)
   }
 
   return (
@@ -91,23 +98,23 @@ const WeddingInfo = () => {
               </div>
             </div>
             
-            {/* 地图图片 */}
-            <div className="mb-6 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-rose-gold-50 to-rose-gold-100">
-              <iframe
-                src="https://uri.amap.com/marker?position=115.032,31.182&name=湖北省麻城市白果镇白果宾馆&src=wedding&coordinate=gaode&callnative=0"
-                width="100%"
-                height="256"
-                frameBorder="0"
-                className="w-full h-64"
-                title="婚礼地址地图"
-              ></iframe>
+            {/* 地图图片 - 腾讯地图静态图 */}
+            <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
+              <img 
+                src="https://apis.map.qq.com/ws/staticmap/v2/?center=31.182,115.032&zoom=15&size=600*300&maptype=roadmap&markers=size:large|color:0xff0000|label:宾|31.182,115.032&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"
+                alt="婚礼地址地图"
+                className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/600x300/f9a8d4/ffffff?text=地图加载中...'
+                }}
+              />
             </div>
             
             {/* 导航按钮 */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => openMap('gaode')}
+              onClick={() => setShowMapSelector(true)}
               className="w-full bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white py-4 rounded-xl font-medium hover:shadow-xl transition-all flex items-center justify-center gap-3 text-lg"
             >
               <FaLocationArrow className="text-xl" />
@@ -115,6 +122,66 @@ const WeddingInfo = () => {
             </motion.button>
           </motion.div>
         </div>
+
+        {/* 地图选择弹窗 */}
+        {showMapSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
+            onClick={() => setShowMapSelector(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-2xl font-bold text-center mb-6 text-rose-gold-600">
+                选择导航应用
+              </h3>
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openMap('gaode')}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-3"
+                >
+                  <FaMapMarkerAlt className="text-xl" />
+                  高德地图
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openMap('baidu')}
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-3"
+                >
+                  <FaMapMarkerAlt className="text-xl" />
+                  百度地图
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openMap('tencent')}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center gap-3"
+                >
+                  <FaMapMarkerAlt className="text-xl" />
+                  腾讯地图
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowMapSelector(false)}
+                  className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-300 transition-all"
+                >
+                  取消
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </section>
   )
