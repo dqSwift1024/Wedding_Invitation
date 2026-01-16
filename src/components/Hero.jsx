@@ -1,12 +1,23 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 const Hero = ({ onEnter, guestName, guestGroup }) => {
   const [showDragonAnimation, setShowDragonAnimation] = useState(false)
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
+  const buttonRef = useRef(null)
 
   const scrollToNext = () => {
-    // 触发龙腾飞动画
+    // 获取按钮的准确位置
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setButtonPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      })
+    }
+    
+    // 触发动画
     setShowDragonAnimation(true)
     
     // 触发樱花飘落
@@ -127,6 +138,7 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
         )}
 
         <motion.button
+          ref={buttonRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.5 }}
@@ -139,160 +151,190 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
         </motion.button>
       </motion.div>
 
-      {/* 开启动画层 - 优雅专业效果 */}
+      {/* 开启动画层 - 精准对齐、视觉完美 */}
       <AnimatePresence>
         {showDragonAnimation && (
-          <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
-            {/* 优雅的波纹扩散 */}
-            {[...Array(4)].map((_, i) => (
+          <div className="fixed inset-0 z-30 pointer-events-none">
+            {/* 第一层：瞬间闪光 */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="absolute"
+              style={{
+                left: buttonPosition.x,
+                top: buttonPosition.y,
+                transform: 'translate(-50%, -50%)',
+                width: '300px',
+                height: '300px',
+                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(251, 207, 232, 0.6) 30%, transparent 70%)',
+                filter: 'blur(20px)',
+              }}
+            />
+
+            {/* 第二层：优雅波纹扩散 */}
+            {[...Array(5)].map((_, i) => (
               <motion.div
                 key={`ripple-${i}`}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
-                  scale: [0, 1, 2.5],
-                  opacity: [0, 0.6, 0]
+                  scale: [0, 3 + i * 0.5],
+                  opacity: [0, 0.7, 0.4, 0]
                 }}
                 transition={{
-                  duration: 1.5,
-                  delay: i * 0.1,
-                  ease: [0.4, 0, 0.2, 1],
+                  duration: 2,
+                  delay: i * 0.08,
+                  ease: [0.34, 1.56, 0.64, 1],
                 }}
-                className="absolute left-1/2 -translate-x-1/2 rounded-full"
+                className="absolute rounded-full"
                 style={{
-                  top: 'calc(50% + 180px)',
-                  width: '100px',
-                  height: '100px',
-                  border: '3px solid rgba(236, 72, 153, 0.5)',
-                  boxShadow: '0 0 30px rgba(236, 72, 153, 0.4)',
+                  left: buttonPosition.x,
+                  top: buttonPosition.y,
+                  transform: 'translate(-50%, -50%)',
+                  width: '80px',
+                  height: '80px',
+                  border: `${3 - i * 0.3}px solid rgba(236, 72, 153, ${0.8 - i * 0.1})`,
+                  boxShadow: `0 0 ${30 - i * 5}px rgba(236, 72, 153, ${0.6 - i * 0.1})`,
                 }}
               />
             ))}
 
-            {/* 中心光晕 */}
+            {/* 第三层：中心光环脉冲 */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ 
-                scale: [0, 1.2, 2],
-                opacity: [0, 0.8, 0]
+                scale: [0, 1.5, 2.5],
+                opacity: [0, 0.9, 0]
               }}
               transition={{ 
-                duration: 1.2,
-                ease: [0.4, 0, 0.2, 1]
+                duration: 1.5,
+                ease: [0.34, 1.56, 0.64, 1]
               }}
-              className="absolute left-1/2 -translate-x-1/2 rounded-full"
+              className="absolute rounded-full"
               style={{
-                top: 'calc(50% + 130px)',
-                width: '150px',
-                height: '150px',
-                background: 'radial-gradient(circle, rgba(251, 207, 232, 0.8) 0%, rgba(236, 72, 153, 0.4) 40%, transparent 70%)',
-                filter: 'blur(15px)',
+                left: buttonPosition.x,
+                top: buttonPosition.y,
+                transform: 'translate(-50%, -50%)',
+                width: '200px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(251, 207, 232, 0.9) 0%, rgba(236, 72, 153, 0.6) 30%, rgba(236, 72, 153, 0.3) 50%, transparent 70%)',
+                filter: 'blur(20px)',
               }}
             />
 
-            {/* 精致的樱花飘散 */}
-            {[...Array(12)].map((_, i) => {
-              const angle = (i * 360) / 12
-              const distance = 80 + Math.random() * 40
+            {/* 第四层：环形樱花爆发 */}
+            {[...Array(16)].map((_, i) => {
+              const angle = (i * 360) / 16
+              const distance = 100 + Math.random() * 60
               const endX = Math.cos((angle * Math.PI) / 180) * distance
-              const endY = Math.sin((angle * Math.PI) / 180) * distance - 50
+              const endY = Math.sin((angle * Math.PI) / 180) * distance
               
               return (
                 <motion.div
                   key={`petal-${i}`}
                   initial={{
-                    x: '50%',
-                    y: 'calc(50% + 180px)',
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
                     opacity: 0,
                     rotate: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: `calc(50% + ${endX}px)`,
-                    y: `calc(50% + 180px + ${endY}px)`,
-                    opacity: [0, 1, 0.8, 0],
-                    rotate: [0, 360 + Math.random() * 180],
-                    scale: [0, 1, 1, 0.5],
+                    x: buttonPosition.x + endX,
+                    y: buttonPosition.y + endY,
+                    opacity: [0, 1, 1, 0.7, 0],
+                    rotate: [0, 360 + Math.random() * 360],
+                    scale: [0, 1.2, 1, 0.8, 0.4],
                   }}
                   transition={{
-                    duration: 1.5,
-                    delay: 0.2 + i * 0.05,
-                    ease: [0.4, 0, 0.2, 1],
+                    duration: 1.8,
+                    delay: 0.15 + i * 0.03,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
-                  className="absolute text-xl"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(236, 72, 153, 0.4))' }}
+                  className="absolute text-2xl"
+                  style={{ 
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'drop-shadow(0 2px 8px rgba(236, 72, 153, 0.5))' 
+                  }}
                 >
                   🌸
                 </motion.div>
               )
             })}
 
-            {/* 爱心粒子上升 */}
-            {[...Array(6)].map((_, i) => {
-              const xOffset = (i - 2.5) * 40
+            {/* 第五层：爱心螺旋上升 */}
+            {[...Array(8)].map((_, i) => {
+              const angle = (i * 360) / 8
+              const spiralRadius = 40
               
               return (
                 <motion.div
                   key={`heart-${i}`}
                   initial={{
-                    x: `calc(50% + ${xOffset}px)`,
-                    y: 'calc(50% + 200px)',
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
                     opacity: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: `calc(50% + ${xOffset + (Math.random() - 0.5) * 30}px)`,
-                    y: 'calc(50% + 50px)',
-                    opacity: [0, 1, 1, 0],
-                    scale: [0, 1.2, 1, 0.8],
-                    rotate: [0, (Math.random() - 0.5) * 90],
+                    x: buttonPosition.x + Math.cos((angle * Math.PI) / 180) * spiralRadius,
+                    y: buttonPosition.y - 150 + Math.sin((angle * Math.PI) / 180) * spiralRadius,
+                    opacity: [0, 1, 1, 0.8, 0],
+                    scale: [0, 1.3, 1.1, 0.9, 0.5],
+                    rotate: [0, 180, 360],
                   }}
                   transition={{
-                    duration: 1.5,
-                    delay: 0.3 + i * 0.1,
-                    ease: [0.4, 0, 0.2, 1],
+                    duration: 2,
+                    delay: 0.25 + i * 0.08,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
-                  className="absolute text-2xl"
+                  className="absolute text-3xl"
+                  style={{ 
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'drop-shadow(0 2px 8px rgba(236, 72, 153, 0.6))'
+                  }}
                 >
                   ❤️
                 </motion.div>
               )
             })}
 
-            {/* 闪光效果 */}
-            {[...Array(8)].map((_, i) => {
-              const angle = (i * 45)
+            {/* 第六层：放射状金光 */}
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * 30)
               
               return (
                 <motion.div
                   key={`ray-${i}`}
-                  initial={{ scale: 0, opacity: 0 }}
+                  initial={{ scaleY: 0, opacity: 0 }}
                   animate={{
-                    scale: [0, 1.5, 0],
-                    opacity: [0, 0.8, 0],
+                    scaleY: [0, 1, 1.5, 0],
+                    opacity: [0, 0.9, 0.7, 0],
                   }}
                   transition={{
-                    duration: 0.8,
-                    delay: 0.1 + i * 0.05,
-                    ease: 'easeOut',
+                    duration: 1.2,
+                    delay: 0.05 + i * 0.03,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
-                  className="absolute left-1/2 -translate-x-1/2"
+                  className="absolute"
                   style={{
-                    top: 'calc(50% + 180px)',
-                    width: '3px',
-                    height: '50px',
-                    background: 'linear-gradient(to bottom, rgba(251, 191, 36, 0), rgba(251, 191, 36, 0.9), rgba(251, 191, 36, 0))',
-                    transformOrigin: 'center',
-                    transform: `translateX(-50%) rotate(${angle}deg) translateY(-25px)`,
-                    boxShadow: '0 0 10px rgba(251, 191, 36, 0.6)',
+                    left: buttonPosition.x,
+                    top: buttonPosition.y,
+                    width: '4px',
+                    height: '80px',
+                    background: 'linear-gradient(to bottom, rgba(251, 191, 36, 0) 0%, rgba(251, 191, 36, 1) 50%, rgba(251, 191, 36, 0) 100%)',
+                    transformOrigin: 'top center',
+                    transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                    boxShadow: '0 0 15px rgba(251, 191, 36, 0.8)',
                   }}
                 />
               )
             })}
 
-            {/* 星光点缀 */}
-            {[...Array(15)].map((_, i) => {
-              const angle = (i * 360) / 15
-              const distance = 60 + Math.random() * 50
+            {/* 第七层：星光爆炸 */}
+            {[...Array(24)].map((_, i) => {
+              const angle = (i * 360) / 24
+              const distance = 80 + Math.random() * 80
               const x = Math.cos((angle * Math.PI) / 180) * distance
               const y = Math.sin((angle * Math.PI) / 180) * distance
               
@@ -300,62 +342,104 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 <motion.div
                   key={`star-${i}`}
                   initial={{
-                    x: '50%',
-                    y: 'calc(50% + 180px)',
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
                     scale: 0,
                     opacity: 0,
                   }}
                   animate={{
-                    x: `calc(50% + ${x}px)`,
-                    y: `calc(50% + 180px + ${y}px)`,
-                    scale: [0, 1, 0.5, 0],
-                    opacity: [0, 1, 0.8, 0],
+                    x: buttonPosition.x + x,
+                    y: buttonPosition.y + y,
+                    scale: [0, 1.5, 1, 0],
+                    opacity: [0, 1, 0.9, 0],
                   }}
                   transition={{
-                    duration: 1,
-                    delay: 0.2 + i * 0.03,
-                    ease: 'easeOut',
+                    duration: 1.2,
+                    delay: 0.1 + i * 0.02,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
                   className="absolute"
+                  style={{ transform: 'translate(-50%, -50%)' }}
                 >
                   <div 
-                    className="w-1.5 h-1.5 bg-white rounded-full" 
-                    style={{ boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)' }}
+                    className="w-2 h-2 bg-white rounded-full" 
+                    style={{ boxShadow: '0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.5)' }}
                   />
                 </motion.div>
               )
             })}
 
-            {/* 细腻的光点上升 */}
-            {[...Array(20)].map((_, i) => {
-              const xOffset = (Math.random() - 0.5) * 150
+            {/* 第八层：细腻粉色粒子云 */}
+            {[...Array(30)].map((_, i) => {
+              const randomAngle = Math.random() * 360
+              const randomDistance = 60 + Math.random() * 100
+              const endX = Math.cos((randomAngle * Math.PI) / 180) * randomDistance
+              const endY = Math.sin((randomAngle * Math.PI) / 180) * randomDistance - 40
               
               return (
                 <motion.div
-                  key={`sparkle-${i}`}
+                  key={`particle-${i}`}
                   initial={{
-                    x: `calc(50% + ${xOffset}px)`,
-                    y: 'calc(50% + 210px)',
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
                     opacity: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: `calc(50% + ${xOffset + (Math.random() - 0.5) * 30}px)`,
-                    y: 'calc(50% + 80px)',
-                    opacity: [0, 0.8, 0.6, 0],
+                    x: buttonPosition.x + endX,
+                    y: buttonPosition.y + endY,
+                    opacity: [0, 0.9, 0.7, 0],
                     scale: [0, 1, 0.8, 0],
                   }}
                   transition={{
                     duration: 1.5,
-                    delay: 0.3 + Math.random() * 0.5,
-                    ease: 'linear',
+                    delay: 0.2 + Math.random() * 0.5,
+                    ease: 'easeOut',
                   }}
-                  className="absolute w-1 h-1 rounded-full"
+                  className="absolute w-1.5 h-1.5 rounded-full"
                   style={{
-                    background: i % 3 === 0 ? '#fbbf24' : i % 3 === 1 ? '#ec4899' : '#f472b6',
-                    boxShadow: `0 0 4px ${i % 3 === 0 ? '#fbbf24' : '#ec4899'}`,
+                    transform: 'translate(-50%, -50%)',
+                    background: i % 4 === 0 ? '#fbbf24' : i % 4 === 1 ? '#ec4899' : i % 4 === 2 ? '#f472b6' : '#fbcfe8',
+                    boxShadow: `0 0 6px ${i % 4 === 0 ? '#fbbf24' : '#ec4899'}`,
                   }}
                 />
+              )
+            })}
+
+            {/* 第九层：玫瑰花瓣旋转 */}
+            {[...Array(6)].map((_, i) => {
+              const angle = (i * 60)
+              
+              return (
+                <motion.div
+                  key={`rose-${i}`}
+                  initial={{
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
+                    opacity: 0,
+                    rotate: 0,
+                    scale: 0,
+                  }}
+                  animate={{
+                    x: buttonPosition.x + Math.cos((angle * Math.PI) / 180) * 70,
+                    y: buttonPosition.y + Math.sin((angle * Math.PI) / 180) * 70,
+                    opacity: [0, 1, 1, 0],
+                    rotate: [0, 720],
+                    scale: [0, 1.5, 1.2, 0.6],
+                  }}
+                  transition={{
+                    duration: 2,
+                    delay: 0.3 + i * 0.1,
+                    ease: [0.34, 1.56, 0.64, 1],
+                  }}
+                  className="absolute text-2xl"
+                  style={{ 
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'drop-shadow(0 2px 6px rgba(236, 72, 153, 0.5))'
+                  }}
+                >
+                  🌹
+                </motion.div>
               )
             })}
           </div>

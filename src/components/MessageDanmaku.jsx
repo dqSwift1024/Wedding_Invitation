@@ -96,10 +96,10 @@ const MessageDanmaku = () => {
     setDisplayMessages([firstMessage])
     messageIndex++
 
-    // 6秒后移除第一条
+    // 7.125秒后移除第一条（动画持续时间5.625秒 + 缓冲时间1.5秒）
     setTimeout(() => {
       setDisplayMessages(prev => prev.filter(m => m.displayId !== firstMessage.displayId))
-    }, 6000)
+    }, 7125)
 
     const interval = setInterval(() => {
       const newMessage = {
@@ -111,11 +111,11 @@ const MessageDanmaku = () => {
       setDisplayMessages(prev => [...prev, newMessage])
       messageIndex++
 
-      // 6秒后移除弹幕
+      // 7.125秒后移除弹幕（动画持续时间5.625秒 + 缓冲时间1.5秒）
       setTimeout(() => {
         setDisplayMessages(prev => prev.filter(m => m.displayId !== newMessage.displayId))
-      }, 6000)
-    }, 1200) // 每1.2秒发送一条弹幕
+      }, 7125)
+    }, 800) // 每0.8秒发送一条弹幕（缩短三分之一：1200 * 2/3 = 800）
 
     return () => clearInterval(interval)
   }, [isVisible, messages])
@@ -143,21 +143,21 @@ const MessageDanmaku = () => {
               scale: 0.7,
             }}
             transition={{
-              duration: 4.5,
+              duration: 5.625,
               ease: 'linear',
               opacity: {
-                duration: 4.5,
+                duration: 5.625,
                 times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
               },
               scale: {
-                duration: 4.5,
+                duration: 5.625,
                 times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
               },
             }}
             className="absolute"
             style={{ willChange: 'transform, opacity' }}
           >
-            <div className="flex items-center gap-2 bg-black/35 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/15"
+            <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10"
               style={{
                 transform: 'translateZ(0)',
                 backfaceVisibility: 'hidden',
