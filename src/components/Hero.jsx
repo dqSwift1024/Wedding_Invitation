@@ -3,16 +3,14 @@ import { FaChevronDown } from 'react-icons/fa'
 import { useState } from 'react'
 
 const Hero = ({ onEnter, guestName, guestGroup }) => {
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [showExplosion, setShowExplosion] = useState(false)
+  const [showDragonAnimation, setShowDragonAnimation] = useState(false)
 
   const scrollToNext = () => {
-    // 触发震撼动画
-    setIsAnimating(true)
-    setShowExplosion(true)
+    // 触发龙腾飞动画
+    setShowDragonAnimation(true)
     
-    // 触发全局樱花暴雨事件
-    window.dispatchEvent(new CustomEvent('triggerCherryBlossomStorm'))
+    // 触发樱花飘落
+    window.dispatchEvent(new CustomEvent('startCherryBlossoms'))
     
     // 触发弹幕显示
     window.dispatchEvent(new CustomEvent('showDanmaku'))
@@ -23,12 +21,11 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
         nextSection.scrollIntoView({ behavior: 'smooth' })
         onEnter()
       }
-      setShowExplosion(false)
     }, 1500)
     
     setTimeout(() => {
-      setIsAnimating(false)
-    }, 2000)
+      setShowDragonAnimation(false)
+    }, 3000)
   }
 
   return (
@@ -131,96 +128,91 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
 
         <motion.button
           initial={{ opacity: 0, y: 20 }}
-          animate={
-            isAnimating
-              ? {
-                  scale: [1, 1.2, 20],
-                  opacity: [1, 1, 0],
-                  rotate: [0, 180, 360],
-                }
-              : { opacity: 1, y: 0 }
-          }
-          transition={
-            isAnimating
-              ? { duration: 1.5, ease: 'easeInOut' }
-              : { duration: 0.8, delay: 1.5 }
-          }
-          whileHover={!isAnimating ? { scale: 1.05 } : {}}
-          whileTap={!isAnimating ? { scale: 0.95 } : {}}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={scrollToNext}
-          disabled={isAnimating}
-          className="relative px-8 py-4 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium text-lg overflow-hidden"
-          style={{
-            boxShadow: isAnimating
-              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 100px rgba(236, 72, 153, 0.6)'
-              : undefined,
-          }}
+          className="px-8 py-4 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium text-lg"
         >
-          {/* 光波效果 */}
-          <AnimatePresence>
-            {isAnimating && (
-              <>
-                <motion.div
-                  initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ scale: 3, opacity: 0 }}
-                  transition={{ duration: 1, ease: 'easeOut' }}
-                  className="absolute inset-0 bg-gradient-radial from-white to-transparent rounded-full"
-                />
-                <motion.div
-                  initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ scale: 3, opacity: 0 }}
-                  transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
-                  className="absolute inset-0 bg-gradient-radial from-rose-300 to-transparent rounded-full"
-                />
-              </>
-            )}
-          </AnimatePresence>
-          <span className="relative z-10">开启邀请函</span>
+          开启邀请函
         </motion.button>
+      </motion.div>
 
-        {/* 爆炸光效 */}
-        <AnimatePresence>
-          {showExplosion && (
-            <>
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{
-                    opacity: 1,
-                    scale: 0,
-                    x: 0,
-                    y: 0,
-                  }}
-                  animate={{
-                    opacity: 0,
-                    scale: 2,
-                    x: Math.cos((i * 30 * Math.PI) / 180) * 300,
-                    y: Math.sin((i * 30 * Math.PI) / 180) * 300,
-                  }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.2, ease: 'easeOut' }}
-                  className="absolute w-4 h-4 bg-rose-400 rounded-full"
-                  style={{
-                    top: '50%',
-                    left: '50%',
-                    boxShadow: '0 0 20px rgba(236, 72, 153, 0.8)',
-                  }}
-                />
-              ))}
+      {/* 龙腾飞动画层 */}
+      <AnimatePresence>
+        {showDragonAnimation && (
+          <div className="fixed inset-0 z-50 pointer-events-none">
+            {/* 金色光芒爆发 */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0.8 }}
+              animate={{ scale: 50, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2, ease: 'easeOut' }}
+              className="absolute top-1/2 left-1/2 w-20 h-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-yellow-300 via-rose-300 to-pink-300"
+              style={{ filter: 'blur(20px)' }}
+            />
+            
+            {/* 龙的飞舞轨迹（用多个光点模拟） */}
+            {[...Array(20)].map((_, i) => (
               <motion.div
-                initial={{ scale: 0, opacity: 0.8 }}
-                animate={{ scale: 100, opacity: 0 }}
-                transition={{ duration: 1.5, ease: 'easeOut' }}
-                className="absolute inset-0 bg-gradient-radial from-rose-200 via-pink-100 to-transparent"
+                key={i}
+                initial={{
+                  x: '50vw',
+                  y: '50vh',
+                  scale: 0,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: ['50vw', '30vw', '60vw', '40vw', '70vw', '90vw'],
+                  y: ['50vh', '40vh', '30vh', '20vh', '15vh', '10vh'],
+                  scale: [0, 1.5, 1.2, 1, 0.8, 0],
+                  opacity: [0, 1, 1, 0.8, 0.5, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  delay: i * 0.1,
+                  ease: 'easeInOut',
+                }}
+                className="absolute w-8 h-8 rounded-full"
                 style={{
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
+                  background: 'radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, rgba(236, 72, 153, 0.6) 50%, transparent 100%)',
+                  boxShadow: '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)',
                 }}
               />
-            </>
-          )}
-        </AnimatePresence>
+            ))}
+            
+            {/* 彩带效果 */}
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={`ribbon-${i}`}
+                initial={{
+                  x: '50vw',
+                  y: '50vh',
+                  scaleX: 0,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: ['50vw', `${20 + i * 10}vw`],
+                  y: ['50vh', `${10 + i * 5}vh`],
+                  scaleX: [0, 2, 1.5, 0],
+                  opacity: [0, 0.8, 0.6, 0],
+                  rotate: [0, 90 * i, 180 * i],
+                }}
+                transition={{
+                  duration: 2,
+                  delay: i * 0.15,
+                  ease: 'easeOut',
+                }}
+                className="absolute w-32 h-1"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${i % 2 === 0 ? 'rgba(251, 191, 36, 0.8)' : 'rgba(236, 72, 153, 0.8)'}, transparent)`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
       </motion.div>
 
       <motion.div
