@@ -21,6 +21,10 @@
   .bg-gradient-rose {
     @apply bg-gradient-to-br from-cream-50 via-rose-gold-50 to-cream-100;
   }
+  
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
 }
 
 /* 自定义滚动条 */

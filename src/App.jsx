@@ -9,6 +9,7 @@ import Gallery from './components/Gallery'
 import Footer from './components/Footer'
 import MusicPlayer from './components/MusicPlayer'
 import FloatingPetals from './components/FloatingPetals'
+import MessageDanmaku from './components/MessageDanmaku'
 import { useVisitorTracking } from './hooks/useVisitorTracking'
 import { useGuestTracking } from './hooks/useGuestTracking'
 import { usePageTracking } from './hooks/usePageTracking'
@@ -40,6 +41,7 @@ function App() {
   return (
     <div className="relative min-h-screen">
       <FloatingPetals />
+      <MessageDanmaku />
       <MusicPlayer isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} />
       
       {/* 传递宾客信息到 Hero 组件 */}

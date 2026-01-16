@@ -1,13 +1,34 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
+import { useState } from 'react'
 
 const Hero = ({ onEnter, guestName, guestGroup }) => {
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [showExplosion, setShowExplosion] = useState(false)
+
   const scrollToNext = () => {
-    const nextSection = document.querySelector('#about-us')
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' })
-      onEnter()
-    }
+    // 触发震撼动画
+    setIsAnimating(true)
+    setShowExplosion(true)
+    
+    // 触发全局樱花暴雨事件
+    window.dispatchEvent(new CustomEvent('triggerCherryBlossomStorm'))
+    
+    // 触发弹幕显示
+    window.dispatchEvent(new CustomEvent('showDanmaku'))
+    
+    setTimeout(() => {
+      const nextSection = document.querySelector('#about-us')
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth' })
+        onEnter()
+      }
+      setShowExplosion(false)
+    }, 1500)
+    
+    setTimeout(() => {
+      setIsAnimating(false)
+    }, 2000)
   }
 
   return (
@@ -110,15 +131,96 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
 
         <motion.button
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.5 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          animate={
+            isAnimating
+              ? {
+                  scale: [1, 1.2, 20],
+                  opacity: [1, 1, 0],
+                  rotate: [0, 180, 360],
+                }
+              : { opacity: 1, y: 0 }
+          }
+          transition={
+            isAnimating
+              ? { duration: 1.5, ease: 'easeInOut' }
+              : { duration: 0.8, delay: 1.5 }
+          }
+          whileHover={!isAnimating ? { scale: 1.05 } : {}}
+          whileTap={!isAnimating ? { scale: 0.95 } : {}}
           onClick={scrollToNext}
-          className="px-8 py-4 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium text-lg"
+          disabled={isAnimating}
+          className="relative px-8 py-4 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all font-medium text-lg overflow-hidden"
+          style={{
+            boxShadow: isAnimating
+              ? '0 0 60px rgba(236, 72, 153, 0.8), 0 0 100px rgba(236, 72, 153, 0.6)'
+              : undefined,
+          }}
         >
-          开启邀请函
+          {/* 光波效果 */}
+          <AnimatePresence>
+            {isAnimating && (
+              <>
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 3, opacity: 0 }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  className="absolute inset-0 bg-gradient-radial from-white to-transparent rounded-full"
+                />
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 3, opacity: 0 }}
+                  transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
+                  className="absolute inset-0 bg-gradient-radial from-rose-300 to-transparent rounded-full"
+                />
+              </>
+            )}
+          </AnimatePresence>
+          <span className="relative z-10">开启邀请函</span>
         </motion.button>
+
+        {/* 爆炸光效 */}
+        <AnimatePresence>
+          {showExplosion && (
+            <>
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{
+                    opacity: 1,
+                    scale: 0,
+                    x: 0,
+                    y: 0,
+                  }}
+                  animate={{
+                    opacity: 0,
+                    scale: 2,
+                    x: Math.cos((i * 30 * Math.PI) / 180) * 300,
+                    y: Math.sin((i * 30 * Math.PI) / 180) * 300,
+                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.2, ease: 'easeOut' }}
+                  className="absolute w-4 h-4 bg-rose-400 rounded-full"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    boxShadow: '0 0 20px rgba(236, 72, 153, 0.8)',
+                  }}
+                />
+              ))}
+              <motion.div
+                initial={{ scale: 0, opacity: 0.8 }}
+                animate={{ scale: 100, opacity: 0 }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+                className="absolute inset-0 bg-gradient-radial from-rose-200 via-pink-100 to-transparent"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+            </>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       <motion.div
