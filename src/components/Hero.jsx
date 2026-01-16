@@ -213,7 +213,6 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
           </div>
         )}
       </AnimatePresence>
-      </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
