@@ -47,23 +47,48 @@ const FloatingPetals = () => {
           key={petal.id}
           initial={{
             x: `${petal.x}vw`,
-            y: -50,
-            opacity: 0.7,
+            y: '-10vh',
+            opacity: 0,
             rotate: 0,
+            scale: 0.5,
           }}
           animate={{
-            y: '100vh',
-            opacity: [0.7, 1, 0.7, 0],
-            rotate: 360,
-            x: `${petal.x + (Math.random() - 0.5) * 20}vw`,
+            y: '110vh',
+            opacity: [0, 0.8, 0.9, 0.8, 0.7, 0.5, 0],
+            rotate: [0, 180, 360, 540, 720],
+            scale: [0.5, 1, 1.1, 1, 0.9, 0.8, 0.6],
+            x: [
+              `${petal.x}vw`,
+              `${petal.x + Math.sin(1) * 5}vw`,
+              `${petal.x + Math.sin(2) * 8}vw`,
+              `${petal.x + Math.sin(3) * 5}vw`,
+              `${petal.x + Math.sin(4) * 8}vw`,
+              `${petal.x + Math.sin(5) * 5}vw`,
+            ],
           }}
           transition={{
             duration: petal.duration,
             delay: petal.delay,
             ease: 'linear',
+            x: {
+              duration: petal.duration,
+              repeat: 0,
+              ease: 'easeInOut',
+            },
+            rotate: {
+              duration: petal.duration,
+              ease: 'linear',
+            },
+            opacity: {
+              duration: petal.duration,
+              times: [0, 0.1, 0.3, 0.5, 0.7, 0.85, 1],
+            },
           }}
-          className="absolute text-2xl"
-          style={{ fontSize: `${petal.size}px` }}
+          className="absolute"
+          style={{ 
+            fontSize: `${petal.size}px`,
+            filter: 'drop-shadow(0 2px 4px rgba(236, 72, 153, 0.3))',
+          }}
         >
           {petal.emoji}
         </motion.div>

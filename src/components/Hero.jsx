@@ -139,74 +139,140 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
         </motion.button>
       </motion.div>
 
-      {/* 龙腾飞动画层 */}
+      {/* 开启动画层 - 优雅的波纹扩散和粒子爆发 */}
       <AnimatePresence>
         {showDragonAnimation && (
-          <div className="fixed inset-0 z-50 pointer-events-none">
-            {/* 金色光芒爆发 */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0.8 }}
-              animate={{ scale: 50, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 2, ease: 'easeOut' }}
-              className="absolute top-1/2 left-1/2 w-20 h-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-yellow-300 via-rose-300 to-pink-300"
-              style={{ filter: 'blur(20px)' }}
-            />
-            
-            {/* 龙的飞舞轨迹（用多个光点模拟） */}
-            {[...Array(20)].map((_, i) => (
+          <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+            {/* 多层波纹扩散 */}
+            {[...Array(5)].map((_, i) => (
               <motion.div
-                key={i}
-                initial={{
-                  x: '50vw',
-                  y: '50vh',
-                  scale: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  x: ['50vw', '30vw', '60vw', '40vw', '70vw', '90vw'],
-                  y: ['50vh', '40vh', '30vh', '20vh', '15vh', '10vh'],
-                  scale: [0, 1.5, 1.2, 1, 0.8, 0],
-                  opacity: [0, 1, 1, 0.8, 0.5, 0],
-                }}
+                key={`wave-${i}`}
+                initial={{ scale: 0, opacity: 0.8 }}
+                animate={{ scale: 15, opacity: 0 }}
+                exit={{ opacity: 0 }}
                 transition={{
-                  duration: 2.5,
-                  delay: i * 0.1,
-                  ease: 'easeInOut',
+                  duration: 2 + i * 0.3,
+                  delay: i * 0.15,
+                  ease: [0.43, 0.13, 0.23, 0.96],
                 }}
-                className="absolute w-8 h-8 rounded-full"
+                className="absolute top-1/2 left-1/2 w-32 h-32 -translate-x-1/2 -translate-y-1/2 rounded-full border-4"
                 style={{
-                  background: 'radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, rgba(236, 72, 153, 0.6) 50%, transparent 100%)',
-                  boxShadow: '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)',
+                  borderColor: `rgba(236, 72, 153, ${0.6 - i * 0.1})`,
+                  boxShadow: `0 0 40px rgba(236, 72, 153, ${0.5 - i * 0.08})`,
                 }}
               />
             ))}
-            
-            {/* 彩带效果 */}
+
+            {/* 中心光晕 */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: [0, 2, 1.5], opacity: [0, 1, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
+              className="absolute top-1/2 left-1/2 w-40 h-40 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(251, 207, 232, 0.8) 0%, rgba(236, 72, 153, 0.4) 50%, transparent 100%)',
+                filter: 'blur(30px)',
+              }}
+            />
+
+            {/* 粒子爆发效果 */}
+            {[...Array(30)].map((_, i) => {
+              const angle = (i * 360) / 30
+              const distance = 200 + Math.random() * 300
+              const endX = Math.cos((angle * Math.PI) / 180) * distance
+              const endY = Math.sin((angle * Math.PI) / 180) * distance
+              
+              return (
+                <motion.div
+                  key={`particle-${i}`}
+                  initial={{
+                    x: '50vw',
+                    y: '50vh',
+                    scale: 0,
+                    opacity: 1,
+                  }}
+                  animate={{
+                    x: `calc(50vw + ${endX}px)`,
+                    y: `calc(50vh + ${endY}px)`,
+                    scale: [0, 1.5, 0],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.5 + Math.random() * 0.5,
+                    delay: Math.random() * 0.3,
+                    ease: 'easeOut',
+                  }}
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{
+                    background: i % 3 === 0 
+                      ? 'radial-gradient(circle, #fbbf24 0%, #ec4899 100%)'
+                      : i % 3 === 1
+                      ? 'radial-gradient(circle, #ec4899 0%, #f472b6 100%)'
+                      : 'radial-gradient(circle, #fbcfe8 0%, #f9a8d4 100%)',
+                    boxShadow: '0 0 15px rgba(236, 72, 153, 0.6)',
+                  }}
+                />
+              )
+            })}
+
+            {/* 飘散的花瓣 */}
+            {[...Array(12)].map((_, i) => {
+              const startX = 30 + Math.random() * 40
+              const endY = -20 - Math.random() * 30
+              
+              return (
+                <motion.div
+                  key={`petal-${i}`}
+                  initial={{
+                    x: `${startX}vw`,
+                    y: '50vh',
+                    opacity: 0,
+                    rotate: 0,
+                    scale: 0,
+                  }}
+                  animate={{
+                    x: `${startX + (Math.random() - 0.5) * 30}vw`,
+                    y: `${endY}vh`,
+                    opacity: [0, 1, 1, 0],
+                    rotate: 360 + Math.random() * 360,
+                    scale: [0, 1.2, 1, 0.8],
+                  }}
+                  transition={{
+                    duration: 2 + Math.random() * 1,
+                    delay: 0.3 + Math.random() * 0.5,
+                    ease: 'easeOut',
+                  }}
+                  className="absolute text-3xl"
+                  style={{ opacity: 0.8 }}
+                >
+                  🌸
+                </motion.div>
+              )
+            })}
+
+            {/* 闪光效果 */}
             {[...Array(8)].map((_, i) => (
               <motion.div
-                key={`ribbon-${i}`}
-                initial={{
-                  x: '50vw',
-                  y: '50vh',
-                  scaleX: 0,
-                  opacity: 0,
-                }}
+                key={`sparkle-${i}`}
+                initial={{ scale: 0, opacity: 0 }}
                 animate={{
-                  x: ['50vw', `${20 + i * 10}vw`],
-                  y: ['50vh', `${10 + i * 5}vh`],
-                  scaleX: [0, 2, 1.5, 0],
-                  opacity: [0, 0.8, 0.6, 0],
-                  rotate: [0, 90 * i, 180 * i],
+                  scale: [0, 1, 0],
+                  opacity: [0, 1, 0],
+                  rotate: [0, 180],
                 }}
                 transition={{
-                  duration: 2,
-                  delay: i * 0.15,
-                  ease: 'easeOut',
+                  duration: 1,
+                  delay: 0.2 + i * 0.1,
+                  ease: 'easeInOut',
                 }}
-                className="absolute w-32 h-1"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${i % 2 === 0 ? 'rgba(251, 191, 36, 0.8)' : 'rgba(236, 72, 153, 0.8)'}, transparent)`,
+                  width: '4px',
+                  height: '40px',
+                  background: 'linear-gradient(to bottom, transparent, #fbbf24, transparent)',
+                  transform: `rotate(${i * 45}deg) translateY(-80px)`,
+                  boxShadow: '0 0 10px #fbbf24',
                 }}
               />
             ))}
