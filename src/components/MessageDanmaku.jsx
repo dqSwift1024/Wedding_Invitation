@@ -24,20 +24,23 @@ const MessageDanmaku = () => {
 
   const fetchMessages = async () => {
     try {
+      // 默认留言 - 更多祝福语
+      const defaultMessages = [
+        { id: 1, name: '小红', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
+        { id: 2, name: '小明', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
+        { id: 3, name: '小李', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
+        { id: 4, name: '小王', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
+        { id: 5, name: '小张', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
+        { id: 6, name: '小赵', content: '天作之合，佳偶天成！💑', created_at: new Date().toISOString() },
+        { id: 7, name: '小刘', content: '相亲相爱，幸福永远！💖', created_at: new Date().toISOString() },
+        { id: 8, name: '小陈', content: '永结同心，白头到老！🎊', created_at: new Date().toISOString() },
+        { id: 9, name: '小林', content: '花好月圆，喜结良缘！🌙', created_at: new Date().toISOString() },
+        { id: 10, name: '小周', content: '琴瑟和鸣，岁月静好！🎵', created_at: new Date().toISOString() },
+      ]
+
       if (!isSupabaseConfigured()) {
-        // 默认留言 - 更多祝福语
-        setMessages([
-          { id: 1, name: '小红', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
-          { id: 2, name: '小明', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
-          { id: 3, name: '小李', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
-          { id: 4, name: '小王', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
-          { id: 5, name: '小张', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
-          { id: 6, name: '小赵', content: '天作之合，佳偶天成！💑', created_at: new Date().toISOString() },
-          { id: 7, name: '小刘', content: '相亲相爱，幸福永远！💖', created_at: new Date().toISOString() },
-          { id: 8, name: '小陈', content: '永结同心，白头到老！🎊', created_at: new Date().toISOString() },
-          { id: 9, name: '小林', content: '花好月圆，喜结良缘！🌙', created_at: new Date().toISOString() },
-          { id: 10, name: '小周', content: '琴瑟和鸣，岁月静好！🎵', created_at: new Date().toISOString() },
-        ])
+        console.log('使用默认留言')
+        setMessages(defaultMessages)
         return
       }
 
@@ -47,30 +50,71 @@ const MessageDanmaku = () => {
         .order('created_at', { ascending: false })
         .limit(50)
 
-      if (error) throw error
-      setMessages(data || [])
+      if (error) {
+        console.error('获取留言失败，使用默认留言:', error)
+        setMessages(defaultMessages)
+        return
+      }
+
+      // 如果没有数据，使用默认留言
+      if (!data || data.length === 0) {
+        console.log('数据库无留言，使用默认留言')
+        setMessages(defaultMessages)
+      } else {
+        setMessages(data)
+      }
     } catch (error) {
-      console.error('获取留言失败:', error)
+      console.error('获取留言失败，使用默认留言:', error)
+      // 出错时使用默认留言
+      setMessages([
+        { id: 1, name: '小红', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
+        { id: 2, name: '小明', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
+        { id: 3, name: '小李', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
+        { id: 4, name: '小王', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
+        { id: 5, name: '小张', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
+      ])
     }
   }
 
   useEffect(() => {
-    if (!isVisible || messages.length === 0) return
+    console.log('弹幕状态:', { isVisible, messagesCount: messages.length })
+    
+    if (!isVisible || messages.length === 0) {
+      console.log('弹幕未激活或无消息')
+      return
+    }
 
+    console.log('开始弹幕循环')
     let messageIndex = 0
+    
+    // 立即显示第一条
+    const firstMessage = {
+      ...messages[0],
+      displayId: Math.random(),
+      xOffset: Math.random() * 30 - 15,
+    }
+    setDisplayMessages([firstMessage])
+    messageIndex++
+
+    // 6秒后移除第一条
+    setTimeout(() => {
+      setDisplayMessages(prev => prev.filter(m => m.displayId !== firstMessage.displayId))
+    }, 6000)
+
     const interval = setInterval(() => {
       const newMessage = {
         ...messages[messageIndex % messages.length],
         displayId: Math.random(),
-        xOffset: Math.random() * 30 - 15, // 随机左右偏移
+        xOffset: Math.random() * 30 - 15,
       }
+      console.log('弹出新弹幕:', newMessage)
       setDisplayMessages(prev => [...prev, newMessage])
       messageIndex++
 
-      // 5秒后移除弹幕（透明度动画）
+      // 6秒后移除弹幕
       setTimeout(() => {
         setDisplayMessages(prev => prev.filter(m => m.displayId !== newMessage.displayId))
-      }, 5000)
+      }, 6000)
     }, 2000) // 每2秒发送一条弹幕
 
     return () => clearInterval(interval)
