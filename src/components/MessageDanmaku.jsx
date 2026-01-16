@@ -127,80 +127,54 @@ const MessageDanmaku = () => {
           <motion.div
             key={msg.displayId}
             initial={{
-              x: `calc(8% + ${msg.xOffset}vw)`,
-              y: 'calc(100vh + 50px)',
+              x: '2%',
+              y: 'calc(100vh - 80px)',
               opacity: 0,
-              scale: 0.5,
-              rotate: -5,
+              scale: 0.8,
             }}
             animate={{
-              x: `calc(8% + ${msg.xOffset}vw)`,
-              y: '-100px',
-              opacity: [0, 1, 1, 1, 1, 0.8, 0.5, 0],
-              scale: [0.5, 1.1, 1, 1, 1, 0.95, 0.9, 0.7],
-              rotate: [-5, 0, 0, 0, 0, 2, 5],
+              x: '2%',
+              y: 'calc(100vh - 100vh * 3 / 5)',
+              opacity: [0, 1, 1, 0.8, 0.6, 0.4, 0.2, 0],
+              scale: [0.8, 1, 1, 0.98, 0.95, 0.92, 0.9, 0.85],
             }}
             exit={{
               opacity: 0,
-              scale: 0.3,
-              y: '-200px',
+              scale: 0.7,
             }}
             transition={{
-              duration: 6,
-              ease: [0.25, 0.46, 0.45, 0.94],
+              duration: 4,
+              ease: 'linear',
               opacity: {
-                duration: 6,
-                times: [0, 0.08, 0.25, 0.5, 0.7, 0.85, 0.95, 1],
+                duration: 4,
+                times: [0, 0.1, 0.3, 0.5, 0.65, 0.8, 0.9, 1],
               },
               scale: {
-                duration: 6,
-                times: [0, 0.1, 0.15, 0.4, 0.7, 0.85, 0.95, 1],
+                duration: 4,
+                times: [0, 0.1, 0.3, 0.5, 0.65, 0.8, 0.9, 1],
               },
             }}
             className="absolute"
           >
-            <motion.div
-              animate={{
-                boxShadow: [
-                  '0 8px 32px rgba(236, 72, 153, 0.4)',
-                  '0 12px 40px rgba(236, 72, 153, 0.6)',
-                  '0 8px 32px rgba(236, 72, 153, 0.4)',
-                ],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="flex items-center gap-3 bg-gradient-to-r from-rose-500/95 to-pink-500/95 backdrop-blur-md rounded-2xl px-5 py-3 border-2 border-white/50"
+            <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20"
               style={{
                 transform: 'translateZ(0)',
                 backfaceVisibility: 'hidden',
               }}
             >
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 1],
-                  rotate: [0, 10, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-white to-rose-100 flex items-center justify-center text-rose-600 text-base font-bold shadow-xl ring-2 ring-white/60"
+              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400/80 to-pink-500/80 flex items-center justify-center text-white text-xs font-bold"
               >
                 {msg.name?.charAt(0) || '💖'}
-              </motion.div>
+              </div>
               <div className="flex flex-col">
-                <span className="text-white text-xs font-bold drop-shadow-lg tracking-wide">
-                  {msg.name || '匿名宾客'}
+                <span className="text-white/90 text-[10px] font-medium">
+                  {msg.name || '匿名'}
                 </span>
-                <span className="text-white text-lg font-bold whitespace-nowrap drop-shadow-xl" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)' }}>
+                <span className="text-white text-sm font-medium whitespace-nowrap">
                   {msg.content}
                 </span>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         ))}
       </AnimatePresence>

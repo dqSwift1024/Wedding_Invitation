@@ -139,73 +139,164 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
         </motion.button>
       </motion.div>
 
-      {/* 开启动画层 - 优雅局部效果 */}
+      {/* 开启动画层 - 冲击力效果 */}
       <AnimatePresence>
         {showDragonAnimation && (
           <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden">
-            {/* 按钮位置的光圈扩散 - 局部效果 */}
+            {/* 强烈的冲击波 - 3层 */}
             {[...Array(3)].map((_, i) => (
               <motion.div
-                key={`wave-${i}`}
-                initial={{ scale: 0, opacity: 0.6 }}
-                animate={{ scale: 4, opacity: 0 }}
+                key={`shockwave-${i}`}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: [0, 0.5, 3.5],
+                  opacity: [0, 0.8, 0]
+                }}
                 exit={{ opacity: 0 }}
                 transition={{
-                  duration: 1.5,
-                  delay: i * 0.15,
-                  ease: [0.34, 1.56, 0.64, 1],
+                  duration: 1.2,
+                  delay: i * 0.12,
+                  ease: [0.16, 1, 0.3, 1],
                 }}
-                className="absolute left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-2"
+                className="absolute left-1/2 -translate-x-1/2 rounded-full"
                 style={{
                   top: 'calc(50% + 180px)',
-                  borderColor: `rgba(236, 72, 153, ${0.5 - i * 0.15})`,
-                  boxShadow: `0 0 20px rgba(236, 72, 153, ${0.4 - i * 0.1})`,
+                  width: '120px',
+                  height: '120px',
+                  border: `${4 - i}px solid rgba(236, 72, 153, ${0.7 - i * 0.2})`,
+                  boxShadow: `0 0 ${40 - i * 10}px rgba(236, 72, 153, ${0.6 - i * 0.15})`,
                 }}
               />
             ))}
 
-            {/* 心形粒子上升 */}
-            {[...Array(8)].map((_, i) => {
-              const xOffset = (i - 4) * 40
+            {/* 爆炸式粒子 - 环形扩散 */}
+            {[...Array(16)].map((_, i) => {
+              const angle = (i * 360) / 16
+              const radius = 150
+              const endX = Math.cos((angle * Math.PI) / 180) * radius
+              const endY = Math.sin((angle * Math.PI) / 180) * radius
               
               return (
                 <motion.div
-                  key={`heart-${i}`}
+                  key={`particle-${i}`}
+                  initial={{
+                    x: '50%',
+                    y: 'calc(50% + 180px)',
+                    scale: 0,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    x: `calc(50% + ${endX}px)`,
+                    y: `calc(50% + 180px + ${endY}px)`,
+                    scale: [0, 1.5, 0.8, 0],
+                    opacity: [0, 1, 0.8, 0],
+                  }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.15 + i * 0.02,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{
+                    background: i % 2 === 0 
+                      ? 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+                      : 'linear-gradient(135deg, #ec4899, #f472b6)',
+                    boxShadow: '0 0 12px rgba(236, 72, 153, 0.8)',
+                  }}
+                />
+              )
+            })}
+
+            {/* 闪光十字 */}
+            {[...Array(2)].map((_, i) => (
+              <motion.div
+                key={`cross-${i}`}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{
+                  scale: [0, 1.5, 0],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 0.6,
+                  delay: i * 0.1,
+                  ease: 'easeOut',
+                }}
+                className="absolute left-1/2 top-[calc(50%+180px)] -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  width: i === 0 ? '4px' : '100px',
+                  height: i === 0 ? '100px' : '4px',
+                  background: 'linear-gradient(to bottom, transparent, #ffffff, transparent)',
+                  boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
+                }}
+              />
+            ))}
+
+            {/* 心形和樱花混合上升 */}
+            {[...Array(10)].map((_, i) => {
+              const xOffset = (i - 5) * 35
+              const isHeart = i % 2 === 0
+              
+              return (
+                <motion.div
+                  key={`emoji-${i}`}
                   initial={{
                     x: `calc(50% + ${xOffset}px)`,
                     y: 'calc(50% + 200px)',
                     scale: 0,
                     opacity: 0,
+                    rotate: 0,
                   }}
                   animate={{
-                    x: `calc(50% + ${xOffset + (Math.random() - 0.5) * 60}px)`,
-                    y: 'calc(50% - 150px)',
-                    scale: [0, 1.2, 1, 0],
+                    x: `calc(50% + ${xOffset + (Math.random() - 0.5) * 50}px)`,
+                    y: 'calc(50% - 120px)',
+                    scale: [0, 1.3, 1, 0.7],
                     opacity: [0, 1, 1, 0],
-                    rotate: [0, 360],
+                    rotate: [0, (Math.random() - 0.5) * 360],
                   }}
                   transition={{
-                    duration: 2,
-                    delay: i * 0.1,
-                    ease: 'easeOut',
+                    duration: 1.8,
+                    delay: 0.3 + i * 0.08,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
                   className="absolute text-2xl"
                 >
-                  ❤️
+                  {isHeart ? '💕' : '🌸'}
                 </motion.div>
               )
             })}
 
-            {/* 闪烁星星 - 围绕按钮 */}
-            {[...Array(12)].map((_, i) => {
-              const angle = (i * 360) / 12
-              const radius = 100 + Math.random() * 50
-              const x = Math.cos((angle * Math.PI) / 180) * radius
-              const y = Math.sin((angle * Math.PI) / 180) * radius
+            {/* 光环脉冲 */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ 
+                scale: [0, 0.8, 2.5],
+                opacity: [0, 0.6, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ 
+                duration: 1,
+                ease: [0.16, 1, 0.3, 1]
+              }}
+              className="absolute left-1/2 -translate-x-1/2 rounded-full"
+              style={{
+                top: 'calc(50% + 105px)',
+                width: '200px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(251, 207, 232, 0.3) 30%, rgba(236, 72, 153, 0.2) 60%, transparent 100%)',
+                filter: 'blur(20px)',
+              }}
+            />
+
+            {/* 星光闪烁 */}
+            {[...Array(20)].map((_, i) => {
+              const angle = Math.random() * 360
+              const distance = 80 + Math.random() * 80
+              const x = Math.cos((angle * Math.PI) / 180) * distance
+              const y = Math.sin((angle * Math.PI) / 180) * distance
               
               return (
                 <motion.div
-                  key={`star-${i}`}
+                  key={`sparkle-${i}`}
                   initial={{
                     x: '50%',
                     y: 'calc(50% + 180px)',
@@ -215,95 +306,20 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                   animate={{
                     x: `calc(50% + ${x}px)`,
                     y: `calc(50% + 180px + ${y}px)`,
-                    scale: [0, 1.5, 0],
+                    scale: [0, 1, 0],
                     opacity: [0, 1, 0],
-                    rotate: [0, 180, 360],
+                    rotate: [0, 180],
                   }}
                   transition={{
-                    duration: 1.2,
-                    delay: i * 0.05,
+                    duration: 0.8,
+                    delay: 0.2 + Math.random() * 0.4,
                     ease: 'easeOut',
                   }}
-                  className="absolute"
-                >
-                  <div className="w-2 h-2 bg-yellow-300 rounded-full" style={{ boxShadow: '0 0 10px #fbbf24' }} />
-                </motion.div>
+                  className="absolute w-2 h-2 bg-white rounded-full"
+                  style={{ boxShadow: '0 0 8px #ffffff' }}
+                />
               )
             })}
-
-            {/* 樱花飘散 - 局部向上 */}
-            {[...Array(6)].map((_, i) => {
-              const xOffset = (i - 3) * 50
-              
-              return (
-                <motion.div
-                  key={`blossom-${i}`}
-                  initial={{
-                    x: `calc(50% + ${xOffset}px)`,
-                    y: 'calc(50% + 180px)',
-                    opacity: 0,
-                    rotate: 0,
-                    scale: 0,
-                  }}
-                  animate={{
-                    x: `calc(50% + ${xOffset + (Math.random() - 0.5) * 100}px)`,
-                    y: 'calc(50% - 100px)',
-                    opacity: [0, 0.9, 0.8, 0],
-                    rotate: 720,
-                    scale: [0, 1, 0.8],
-                  }}
-                  transition={{
-                    duration: 1.8,
-                    delay: 0.2 + i * 0.08,
-                    ease: 'easeOut',
-                  }}
-                  className="absolute text-2xl"
-                >
-                  🌸
-                </motion.div>
-              )
-            })}
-
-            {/* 光芒闪烁 */}
-            {[...Array(4)].map((_, i) => (
-              <motion.div
-                key={`glow-${i}`}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  scale: [0, 2, 0],
-                  opacity: [0, 0.6, 0],
-                  rotate: [0, 90],
-                }}
-                transition={{
-                  duration: 0.8,
-                  delay: i * 0.15,
-                  ease: 'easeOut',
-                }}
-                className="absolute left-1/2 -translate-x-1/2"
-                style={{
-                  top: 'calc(50% + 180px)',
-                  width: '3px',
-                  height: '60px',
-                  background: 'linear-gradient(to bottom, transparent, rgba(251, 191, 36, 0.8), transparent)',
-                  transform: `translateX(-50%) rotate(${i * 45}deg)`,
-                  boxShadow: '0 0 15px rgba(251, 191, 36, 0.6)',
-                }}
-              />
-            ))}
-
-            {/* 温柔光晕 */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 1.5, 1], opacity: [0, 0.4, 0] }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
-              className="absolute left-1/2 -translate-x-1/2 w-48 h-48 rounded-full"
-              style={{
-                top: 'calc(50% + 105px)',
-                background: 'radial-gradient(circle, rgba(251, 207, 232, 0.6) 0%, rgba(236, 72, 153, 0.3) 50%, transparent 100%)',
-                filter: 'blur(25px)',
-              }}
-            />
           </div>
         )}
       </AnimatePresence>
