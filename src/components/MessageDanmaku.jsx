@@ -26,16 +26,16 @@ const MessageDanmaku = () => {
     try {
       // 默认留言 - 更多祝福语
       const defaultMessages = [
-        { id: 1, name: '小红', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
-        { id: 2, name: '小明', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
-        { id: 3, name: '小李', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
-        { id: 4, name: '小王', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
-        { id: 5, name: '小张', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
-        { id: 6, name: '小赵', content: '天作之合，佳偶天成！💑', created_at: new Date().toISOString() },
-        { id: 7, name: '小刘', content: '相亲相爱，幸福永远！💖', created_at: new Date().toISOString() },
-        { id: 8, name: '小陈', content: '永结同心，白头到老！🎊', created_at: new Date().toISOString() },
-        { id: 9, name: '小林', content: '花好月圆，喜结良缘！🌙', created_at: new Date().toISOString() },
-        { id: 10, name: '小周', content: '琴瑟和鸣，岁月静好！🎵', created_at: new Date().toISOString() },
+        { id: 1, name: '高圆圆', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
+        { id: 2, name: '邓紫棋', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
+        { id: 3, name: '王一博', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
+        { id: 4, name: '赵丽颖', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
+        { id: 5, name: '迪丽热巴', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
+        { id: 6, name: '易烊千玺', content: '天作之合，佳偶天成！💑', created_at: new Date().toISOString() },
+        { id: 7, name: '白敬亭', content: '相亲相爱，幸福永远！💖', created_at: new Date().toISOString() },
+        { id: 8, name: '刘亦菲', content: '永结同心，白头到老！🎊', created_at: new Date().toISOString() },
+        { id: 9, name: '周深', content: '花好月圆，喜结良缘！🌙', created_at: new Date().toISOString() },
+        { id: 10, name: '胡歌', content: '琴瑟和鸣，岁月静好！🎵', created_at: new Date().toISOString() },
       ]
 
       if (!isSupabaseConfigured()) {
@@ -67,11 +67,11 @@ const MessageDanmaku = () => {
       console.error('获取留言失败，使用默认留言:', error)
       // 出错时使用默认留言
       setMessages([
-        { id: 1, name: '小红', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
-        { id: 2, name: '小明', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
-        { id: 3, name: '小李', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
-        { id: 4, name: '小王', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
-        { id: 5, name: '小张', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
+        { id: 1, name: '高圆圆', content: '祝福新人百年好合！💕', created_at: new Date().toISOString() },
+        { id: 2, name: '邓紫棋', content: '恭喜恭喜！白头偕老！🎉', created_at: new Date().toISOString() },
+        { id: 3, name: '王一博', content: '新婚快乐！幸福美满！✨', created_at: new Date().toISOString() },
+        { id: 4, name: '赵丽颖', content: '祝你们永远幸福！❤️', created_at: new Date().toISOString() },
+        { id: 5, name: '迪丽热巴', content: '执子之手，与子偕老！🌹', created_at: new Date().toISOString() },
       ])
     }
   }
@@ -115,7 +115,7 @@ const MessageDanmaku = () => {
       setTimeout(() => {
         setDisplayMessages(prev => prev.filter(m => m.displayId !== newMessage.displayId))
       }, 6000)
-    }, 2000) // 每2秒发送一条弹幕
+    }, 1200) // 每1.2秒发送一条弹幕
 
     return () => clearInterval(interval)
   }, [isVisible, messages])
