@@ -127,50 +127,51 @@ const MessageDanmaku = () => {
           <motion.div
             key={msg.displayId}
             initial={{
-              x: '2%',
-              y: 'calc(100vh - 80px)',
+              x: '3%',
+              y: window.innerHeight - 60,
               opacity: 0,
               scale: 0.8,
             }}
             animate={{
-              x: '2%',
-              y: 'calc(100vh - 100vh * 3 / 5)',
+              x: '3%',
+              y: window.innerHeight * 0.4,
               opacity: [0, 1, 1, 0.8, 0.6, 0.4, 0.2, 0],
-              scale: [0.8, 1, 1, 0.98, 0.95, 0.92, 0.9, 0.85],
+              scale: [0.8, 1, 1, 0.98, 0.96, 0.93, 0.9, 0.87],
             }}
             exit={{
               opacity: 0,
               scale: 0.7,
             }}
             transition={{
-              duration: 4,
+              duration: 4.5,
               ease: 'linear',
               opacity: {
-                duration: 4,
-                times: [0, 0.1, 0.3, 0.5, 0.65, 0.8, 0.9, 1],
+                duration: 4.5,
+                times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
               },
               scale: {
-                duration: 4,
-                times: [0, 0.1, 0.3, 0.5, 0.65, 0.8, 0.9, 1],
+                duration: 4.5,
+                times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
               },
             }}
             className="absolute"
+            style={{ willChange: 'transform, opacity' }}
           >
-            <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20"
+            <div className="flex items-center gap-2 bg-black/35 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/15"
               style={{
                 transform: 'translateZ(0)',
                 backfaceVisibility: 'hidden',
               }}
             >
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400/80 to-pink-500/80 flex items-center justify-center text-white text-xs font-bold"
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-rose-400/70 to-pink-500/70 flex items-center justify-center text-white text-[10px] font-bold"
               >
                 {msg.name?.charAt(0) || '💖'}
               </div>
-              <div className="flex flex-col">
-                <span className="text-white/90 text-[10px] font-medium">
+              <div className="flex flex-col justify-center">
+                <span className="text-white/80 text-[9px] font-medium leading-tight">
                   {msg.name || '匿名'}
                 </span>
-                <span className="text-white text-sm font-medium whitespace-nowrap">
+                <span className="text-white text-xs font-medium whitespace-nowrap leading-tight">
                   {msg.content}
                 </span>
               </div>
