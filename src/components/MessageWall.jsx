@@ -91,6 +91,19 @@ const MessageWall = () => {
       setNewMessage({ name: '', content: '' })
       fetchMessages() // 重新获取留言列表
       
+      // 触发新留言弹幕事件
+      if (data && data.length > 0) {
+        const newMessageData = data[0]
+        window.dispatchEvent(new CustomEvent('newMessageSubmitted', {
+          detail: {
+            id: newMessageData.id,
+            name: newMessageData.name,
+            content: newMessageData.content,
+            created_at: newMessageData.created_at
+          }
+        }))
+      }
+      
     } catch (error) {
       console.error('提交留言失败:', error)
       alert('提交失败，请稍后重试或联系管理员')
@@ -151,7 +164,7 @@ const MessageWall = () => {
         </motion.div>
 
         {/* 留言列表 */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4">
           {messages.length === 0 ? (
             <div className="col-span-2 text-center text-gray-500 py-12">
               还没有留言，快来留下第一条祝福吧！
@@ -164,20 +177,20 @@ const MessageWall = () => {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-rose-gold-400"
+                className="bg-white rounded-lg shadow-md p-4 border-l-4 border-rose-gold-400"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 flex items-center justify-center text-white font-bold">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {message.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">{message.name}</div>
-                    <div className="text-xs text-gray-500">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-800 text-sm truncate">{message.name}</div>
+                    <div className="text-[10px] text-gray-500">
                       {new Date(message.created_at).toLocaleDateString('zh-CN')}
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed">{message.content}</p>
+                <p className="text-gray-700 leading-relaxed text-sm line-clamp-2">{message.content}</p>
               </motion.div>
             ))
           )}
