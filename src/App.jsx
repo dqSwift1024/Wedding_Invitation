@@ -50,6 +50,7 @@ function App() {
           onEnter={() => setIsMusicPlaying(true)} 
           guestName={guest?.guest_name}
           guestGroup={guest?.guest_group}
+          guestRelation={guest?.guest_relation}
         />
       </div>
       

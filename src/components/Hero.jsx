@@ -2,7 +2,96 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
 import { useState, useRef, useEffect } from 'react'
 
-const Hero = ({ onEnter, guestName, guestGroup }) => {
+const Hero = ({ onEnter, guestName, guestGroup, guestRelation }) => {
+  // 根据guest_group和guest_relation生成个性化提示语
+  const getPersonalizedGreeting = () => {
+    if (!guestGroup && !guestRelation) {
+      return null
+    }
+
+    const isBrideSide = guestGroup === '新娘方'
+    const isGroomSide = guestGroup === '新郎方'
+    
+    // 新人名字
+    const brideName = '景欢'
+    const groomName = '吴旭'
+    
+    // 定义使用名字的关系（亲近关系）
+    const useNameRelations = ['父母', '父亲', '母亲', '爸爸', '妈妈', '兄弟姐妹', 
+                             '哥哥', '姐姐', '弟弟', '妹妹', '朋友', '同学']
+    
+    // 根据关系生成不同的提示语
+    if (guestRelation) {
+      // 新娘方的关系提示语
+      if (isBrideSide) {
+        const useName = useNameRelations.includes(guestRelation)
+        const name = useName ? brideName : '新娘'
+        
+        const brideGreetings = {
+          '父母': `感谢您养育了美丽的${name}`,
+          '父亲': `感谢您养育了美丽的${name}`,
+          '母亲': `感谢您养育了美丽的${name}`,
+          '爸爸': `感谢您养育了美丽的${name}`,
+          '妈妈': `感谢您养育了美丽的${name}`,
+          '兄弟姐妹': `感谢您陪伴${name}成长`,
+          '哥哥': `感谢您陪伴${name}成长`,
+          '姐姐': `感谢您陪伴${name}成长`,
+          '弟弟': `感谢您陪伴${name}成长`,
+          '妹妹': `感谢您陪伴${name}成长`,
+          '朋友': `感谢您见证${name}的青春岁月`,
+          '同学': `感谢您陪伴${name}的求学时光`,
+          '同事': '感谢您在工作中的支持与陪伴',
+          '老师': '感谢您对新娘的悉心教导',
+          '长辈': '感谢您对新娘的关爱与呵护',
+          '亲戚': '感谢您对新娘的关心与照顾',
+        }
+        
+        return brideGreetings[guestRelation] || `感谢您作为新娘的${guestRelation}前来见证`
+      }
+      
+      // 新郎方的关系提示语
+      if (isGroomSide) {
+        const useName = useNameRelations.includes(guestRelation)
+        const name = useName ? groomName : '新郎'
+        
+        const groomGreetings = {
+          '父母': `感谢您养育了优秀的${name}`,
+          '父亲': `感谢您养育了优秀的${name}`,
+          '母亲': `感谢您养育了优秀的${name}`,
+          '爸爸': `感谢您养育了优秀的${name}`,
+          '妈妈': `感谢您养育了优秀的${name}`,
+          '兄弟姐妹': `感谢您陪伴${name}成长`,
+          '哥哥': `感谢您陪伴${name}成长`,
+          '姐姐': `感谢您陪伴${name}成长`,
+          '弟弟': `感谢您陪伴${name}成长`,
+          '妹妹': `感谢您陪伴${name}成长`,
+          '朋友': `感谢您见证${name}的青春岁月`,
+          '同学': `感谢您陪伴${name}的求学时光`,
+          '同事': '感谢您在工作中的支持与陪伴',
+          '老师': '感谢您对新郎的悉心教导',
+          '长辈': '感谢您对新郎的关爱与呵护',
+          '亲戚': '感谢您对新郎的关心与照顾',
+        }
+        
+        return groomGreetings[guestRelation] || `感谢您作为新郎的${guestRelation}前来见证`
+      }
+      
+      // 只有关系信息，没有分组
+      return `感谢您作为${guestRelation}前来见证我们的幸福时刻`
+    }
+    
+    // 只有分组信息，没有关系
+    if (isBrideSide) {
+      return '感谢您作为新娘方的贵宾前来见证'
+    }
+    if (isGroomSide) {
+      return '感谢您作为新郎方的贵宾前来见证'
+    }
+    
+    return null
+  }
+
+  const personalizedGreeting = getPersonalizedGreeting()
   const [showDragonAnimation, setShowDragonAnimation] = useState(false)
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
   const buttonRef = useRef(null)
@@ -92,11 +181,15 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
               <p className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
                 {guestName}，您好！
               </p>
-              {guestGroup && (
+              {personalizedGreeting ? (
+                <p className="text-sm md:text-base text-gray-600 mt-1">
+                  {personalizedGreeting}
+                </p>
+              ) : guestGroup ? (
                 <p className="text-sm md:text-base text-gray-600 mt-1">
                   {guestGroup}
                 </p>
-              )}
+              ) : null}
             </div>
           </motion.div>
         )}
