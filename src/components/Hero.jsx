@@ -173,22 +173,20 @@ const Hero = ({ onEnter, guestName, guestGroup, guestRelation }) => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <div className="inline-block bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl px-8 py-4 border-2 border-rose-200">
-              <p className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-                {guestName}，您好！
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-gradient mb-3 tracking-wide">
+              {guestName}，您好！
+            </h2>
+            {personalizedGreeting ? (
+              <p className="text-base md:text-lg text-rose-gold-700 font-light leading-relaxed max-w-2xl mx-auto">
+                {personalizedGreeting}
               </p>
-              {personalizedGreeting ? (
-                <p className="text-sm md:text-base text-gray-600 mt-1">
-                  {personalizedGreeting}
-                </p>
-              ) : guestGroup ? (
-                <p className="text-sm md:text-base text-gray-600 mt-1">
-                  {guestGroup}
-                </p>
-              ) : null}
-            </div>
+            ) : guestGroup ? (
+              <p className="text-base md:text-lg text-rose-gold-700 font-light leading-relaxed max-w-2xl mx-auto">
+                {guestGroup}
+              </p>
+            ) : null}
           </motion.div>
         )}
 
