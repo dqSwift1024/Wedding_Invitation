@@ -8,17 +8,20 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
   const buttonRef = useRef(null)
 
   const scrollToNext = () => {
-    // 获取按钮的准确位置
+    // 获取按钮的准确位置（相对于视口）
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
+      // 计算按钮的中心点，确保精确对齐
       setButtonPosition({
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2,
       })
+      
+      // 触发动画（稍微延迟以确保状态更新）
+      requestAnimationFrame(() => {
+        setShowDragonAnimation(true)
+      })
     }
-    
-    // 触发动画
-    setShowDragonAnimation(true)
     
     // 触发樱花飘落
     window.dispatchEvent(new CustomEvent('startCherryBlossoms'))
@@ -153,8 +156,18 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
 
       {/* 开启动画层 - 精准对齐、视觉完美 */}
       <AnimatePresence>
-        {showDragonAnimation && (
+        {showDragonAnimation && buttonPosition.x > 0 && (
           <div className="fixed inset-0 z-30 pointer-events-none">
+            {/* 调试用 - 按钮中心标记点（可选，用于验证对齐）*/}
+            {/* <div 
+              className="absolute w-4 h-4 bg-red-500 rounded-full"
+              style={{
+                left: `${buttonPosition.x}px`,
+                top: `${buttonPosition.y}px`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            /> */}
+
             {/* 第一层：瞬间闪光 */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -162,8 +175,8 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="absolute"
               style={{
-                left: buttonPosition.x,
-                top: buttonPosition.y,
+                left: `${buttonPosition.x}px`,
+                top: `${buttonPosition.y}px`,
                 transform: 'translate(-50%, -50%)',
                 width: '300px',
                 height: '300px',
@@ -188,8 +201,8 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 }}
                 className="absolute rounded-full"
                 style={{
-                  left: buttonPosition.x,
-                  top: buttonPosition.y,
+                  left: `${buttonPosition.x}px`,
+                  top: `${buttonPosition.y}px`,
                   transform: 'translate(-50%, -50%)',
                   width: '80px',
                   height: '80px',
@@ -212,8 +225,8 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
               }}
               className="absolute rounded-full"
               style={{
-                left: buttonPosition.x,
-                top: buttonPosition.y,
+                left: `${buttonPosition.x}px`,
+                top: `${buttonPosition.y}px`,
                 transform: 'translate(-50%, -50%)',
                 width: '200px',
                 height: '200px',
@@ -233,15 +246,15 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 <motion.div
                   key={`petal-${i}`}
                   initial={{
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     opacity: 0,
                     rotate: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: buttonPosition.x + endX,
-                    y: buttonPosition.y + endY,
+                    left: `${buttonPosition.x + endX}px`,
+                    top: `${buttonPosition.y + endY}px`,
                     opacity: [0, 1, 1, 0.7, 0],
                     rotate: [0, 360 + Math.random() * 360],
                     scale: [0, 1.2, 1, 0.8, 0.4],
@@ -271,14 +284,14 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 <motion.div
                   key={`heart-${i}`}
                   initial={{
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     opacity: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: buttonPosition.x + Math.cos((angle * Math.PI) / 180) * spiralRadius,
-                    y: buttonPosition.y - 150 + Math.sin((angle * Math.PI) / 180) * spiralRadius,
+                    left: `${buttonPosition.x + Math.cos((angle * Math.PI) / 180) * spiralRadius}px`,
+                    top: `${buttonPosition.y - 150 + Math.sin((angle * Math.PI) / 180) * spiralRadius}px`,
                     opacity: [0, 1, 1, 0.8, 0],
                     scale: [0, 1.3, 1.1, 0.9, 0.5],
                     rotate: [0, 180, 360],
@@ -318,12 +331,12 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                   }}
                   className="absolute"
                   style={{
-                    left: buttonPosition.x,
-                    top: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     width: '4px',
                     height: '80px',
                     background: 'linear-gradient(to bottom, rgba(251, 191, 36, 0) 0%, rgba(251, 191, 36, 1) 50%, rgba(251, 191, 36, 0) 100%)',
-                    transformOrigin: 'top center',
+                    transformOrigin: 'center top',
                     transform: `translate(-50%, -50%) rotate(${angle}deg)`,
                     boxShadow: '0 0 15px rgba(251, 191, 36, 0.8)',
                   }}
@@ -342,14 +355,14 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 <motion.div
                   key={`star-${i}`}
                   initial={{
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     scale: 0,
                     opacity: 0,
                   }}
                   animate={{
-                    x: buttonPosition.x + x,
-                    y: buttonPosition.y + y,
+                    left: `${buttonPosition.x + x}px`,
+                    top: `${buttonPosition.y + y}px`,
                     scale: [0, 1.5, 1, 0],
                     opacity: [0, 1, 0.9, 0],
                   }}
@@ -380,14 +393,14 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
                 <motion.div
                   key={`particle-${i}`}
                   initial={{
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     opacity: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: buttonPosition.x + endX,
-                    y: buttonPosition.y + endY,
+                    left: `${buttonPosition.x + endX}px`,
+                    top: `${buttonPosition.y + endY}px`,
                     opacity: [0, 0.9, 0.7, 0],
                     scale: [0, 1, 0.8, 0],
                   }}
@@ -409,20 +422,21 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
             {/* 第九层：玫瑰花瓣旋转 */}
             {[...Array(6)].map((_, i) => {
               const angle = (i * 60)
+              const radius = 70
               
               return (
                 <motion.div
                   key={`rose-${i}`}
                   initial={{
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
+                    left: `${buttonPosition.x}px`,
+                    top: `${buttonPosition.y}px`,
                     opacity: 0,
                     rotate: 0,
                     scale: 0,
                   }}
                   animate={{
-                    x: buttonPosition.x + Math.cos((angle * Math.PI) / 180) * 70,
-                    y: buttonPosition.y + Math.sin((angle * Math.PI) / 180) * 70,
+                    left: `${buttonPosition.x + Math.cos((angle * Math.PI) / 180) * radius}px`,
+                    top: `${buttonPosition.y + Math.sin((angle * Math.PI) / 180) * radius}px`,
                     opacity: [0, 1, 1, 0],
                     rotate: [0, 720],
                     scale: [0, 1.5, 1.2, 0.6],

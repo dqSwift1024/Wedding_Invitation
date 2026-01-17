@@ -115,7 +115,7 @@ const MessageDanmaku = () => {
       setTimeout(() => {
         setDisplayMessages(prev => prev.filter(m => m.displayId !== newMessage.displayId))
       }, 7125)
-    }, 800) // 每0.8秒发送一条弹幕（缩短三分之一：1200 * 2/3 = 800）
+    }, 1000) // 每1秒发送一条弹幕
 
     return () => clearInterval(interval)
   }, [isVisible, messages])

@@ -52,7 +52,7 @@ const AboutUs = () => {
               />
             </div>
             <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Huan</h3>
-            <p className="text-gray-600">温柔体贴，热爱生活</p>
+            <p className="text-gray-600">美丽善良，充满活力</p>
           </motion.div>
 
           <motion.div
@@ -72,7 +72,7 @@ const AboutUs = () => {
               />
             </div>
             <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">Xu</h3>
-            <p className="text-gray-600">美丽善良，充满活力</p>
+            <p className="text-gray-600">温柔体贴，热爱生活</p>
           </motion.div>
         </div>
 
