@@ -9,17 +9,12 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
   const videoRef = useRef(null)
 
   useEffect(() => {
-    // 在"开启邀请函"按钮动画完成后开始播放视频
-    // 按钮动画：delay 1.5s + duration 0.8s = 2.3s
-    const timer = setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.play().catch(err => {
-          console.log('视频自动播放被阻止:', err)
-        })
-      }
-    }, 2300)
-
-    return () => clearTimeout(timer)
+    // 确保视频立即开始播放
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.log('视频自动播放被阻止:', err)
+      })
+    }
   }, [])
 
   const scrollToNext = () => {

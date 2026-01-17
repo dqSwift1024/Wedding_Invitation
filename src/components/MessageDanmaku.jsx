@@ -86,15 +86,18 @@ const MessageDanmaku = () => {
 
     console.log('开始弹幕循环')
     let messageIndex = 0
+    let yOffsetIndex = 0 // 用于跟踪Y轴偏移，避免重叠
     
     // 立即显示第一条
     const firstMessage = {
       ...messages[0],
       displayId: Math.random(),
       xOffset: Math.random() * 30 - 15,
+      yOffsetIndex: yOffsetIndex,
     }
     setDisplayMessages([firstMessage])
     messageIndex++
+    yOffsetIndex++
 
     // 7.125秒后移除第一条（动画持续时间5.625秒 + 缓冲时间1.5秒）
     setTimeout(() => {
@@ -106,10 +109,12 @@ const MessageDanmaku = () => {
         ...messages[messageIndex % messages.length],
         displayId: Math.random(),
         xOffset: Math.random() * 30 - 15,
+        yOffsetIndex: yOffsetIndex % 5, // 使用5个不同的Y轴位置循环
       }
       console.log('弹出新弹幕:', newMessage)
       setDisplayMessages(prev => [...prev, newMessage])
       messageIndex++
+      yOffsetIndex++
 
       // 7.125秒后移除弹幕（动画持续时间5.625秒 + 缓冲时间1.5秒）
       setTimeout(() => {
@@ -123,40 +128,46 @@ const MessageDanmaku = () => {
   return (
     <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
       <AnimatePresence>
-        {isVisible && displayMessages.map((msg) => (
-          <motion.div
-            key={msg.displayId}
-            initial={{
-              x: '3%',
-              y: window.innerHeight - 60,
-              opacity: 0,
-              scale: 0.8,
-            }}
-            animate={{
-              x: '3%',
-              y: window.innerHeight * 0.4,
-              opacity: [0, 1, 1, 0.8, 0.6, 0.4, 0.2, 0],
-              scale: [0.8, 1, 1, 0.98, 0.96, 0.93, 0.9, 0.87],
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.7,
-            }}
-            transition={{
-              duration: 5.625,
-              ease: 'linear',
-              opacity: {
+        {isVisible && displayMessages.map((msg) => {
+          // 根据yOffsetIndex计算Y轴偏移，避免重叠
+          const yOffset = (msg.yOffsetIndex || 0) * 70 // 每条弹幕间隔70px
+          const startY = window.innerHeight - 60 - yOffset
+          const endY = window.innerHeight * 0.4 - yOffset
+          
+          return (
+            <motion.div
+              key={msg.displayId}
+              initial={{
+                x: '3%',
+                y: startY,
+                opacity: 0,
+                scale: 0.8,
+              }}
+              animate={{
+                x: '3%',
+                y: endY,
+                opacity: [0, 1, 1, 0.8, 0.6, 0.4, 0.2, 0],
+                scale: [0.8, 1, 1, 0.98, 0.96, 0.93, 0.9, 0.87],
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.7,
+              }}
+              transition={{
                 duration: 5.625,
-                times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
-              },
-              scale: {
-                duration: 5.625,
-                times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
-              },
-            }}
-            className="absolute"
-            style={{ willChange: 'transform, opacity' }}
-          >
+                ease: 'linear',
+                opacity: {
+                  duration: 5.625,
+                  times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
+                },
+                scale: {
+                  duration: 5.625,
+                  times: [0, 0.1, 0.35, 0.55, 0.7, 0.82, 0.92, 1],
+                },
+              }}
+              className="absolute"
+              style={{ willChange: 'transform, opacity' }}
+            >
             <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10"
               style={{
                 transform: 'translateZ(0)',
@@ -177,7 +188,7 @@ const MessageDanmaku = () => {
               </div>
             </div>
           </motion.div>
-        ))}
+        )})}
       </AnimatePresence>
     </div>
   )
