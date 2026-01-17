@@ -1,11 +1,26 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const Hero = ({ onEnter, guestName, guestGroup }) => {
   const [showDragonAnimation, setShowDragonAnimation] = useState(false)
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
   const buttonRef = useRef(null)
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    // 在"开启邀请函"按钮动画完成后开始播放视频
+    // 按钮动画：delay 1.5s + duration 0.8s = 2.3s
+    const timer = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.play().catch(err => {
+          console.log('视频自动播放被阻止:', err)
+        })
+      }
+    }, 2300)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const scrollToNext = () => {
     // 获取按钮的准确位置（相对于视口）
@@ -47,10 +62,12 @@ const Hero = ({ onEnter, guestName, guestGroup }) => {
       {/* 视频背景 */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover opacity-30"
         >
           <source src="/videos/hero-background.mp4" type="video/mp4" />
