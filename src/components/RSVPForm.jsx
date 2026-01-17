@@ -11,7 +11,7 @@ const RSVPForm = () => {
   
   const [formData, setFormData] = useState({
     attendance: '',
-    guests: 1,
+    guests: '',
     phone: '',
     message: '',
   })
@@ -20,14 +20,40 @@ const RSVPForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'guests' ? parseInt(value) || 1 : value,
-    }))
+    if (name === 'guests') {
+      // 允许空字符串，以便用户可以清空输入框
+      if (value === '') {
+        setFormData(prev => ({
+          ...prev,
+          [name]: '',
+        }))
+      } else {
+        // 只允许输入数字，并限制范围
+        const numValue = parseInt(value)
+        if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
+          setFormData(prev => ({
+            ...prev,
+            [name]: numValue,
+          }))
+        }
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // 验证出席人数
+    if (formData.guests === '' || formData.guests < 1 || formData.guests > 10) {
+      alert('请输入有效的出席人数（1-10人）')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
@@ -61,7 +87,7 @@ const RSVPForm = () => {
       setIsSuccess(true)
       setFormData({
         attendance: '',
-        guests: 1,
+        guests: '',
         phone: '',
         message: '',
       })
@@ -146,16 +172,17 @@ const RSVPForm = () => {
                 </div>
               </div>
 
-              {/* 同行人数 */}
+              {/* 出席人数 */}
               <div>
                 <label className="block text-gray-700 font-semibold mb-3">
-                  同行人数 <span className="text-rose-gold-500">*</span>
+                  出席人数 <span className="text-rose-gold-500">*</span>
                 </label>
                 <input
                   type="number"
                   name="guests"
                   value={formData.guests}
                   onChange={handleChange}
+                  placeholder="请输入出席人数（1-10人）"
                   min="1"
                   max="10"
                   required
