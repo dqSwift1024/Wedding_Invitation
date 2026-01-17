@@ -16,64 +16,62 @@ const Hero = ({ onEnter, guestName, guestGroup, guestRelation }) => {
     const brideName = '景欢'
     const groomName = '吴旭'
     
-    // 定义使用名字的关系（亲近关系）
-    const useNameRelations = ['父母', '父亲', '母亲', '爸爸', '妈妈', '兄弟姐妹', 
-                             '哥哥', '姐姐', '弟弟', '妹妹', '朋友', '同学']
-    
     // 根据关系生成不同的提示语
     if (guestRelation) {
       // 新娘方的关系提示语
       if (isBrideSide) {
-        const useName = useNameRelations.includes(guestRelation)
-        const name = useName ? brideName : '新娘'
-        
         const brideGreetings = {
-          '父母': `感谢您养育了美丽的${name}`,
-          '父亲': `感谢您养育了美丽的${name}`,
-          '母亲': `感谢您养育了美丽的${name}`,
-          '爸爸': `感谢您养育了美丽的${name}`,
-          '妈妈': `感谢您养育了美丽的${name}`,
-          '兄弟姐妹': `感谢您陪伴${name}成长`,
-          '哥哥': `感谢您陪伴${name}成长`,
-          '姐姐': `感谢您陪伴${name}成长`,
-          '弟弟': `感谢您陪伴${name}成长`,
-          '妹妹': `感谢您陪伴${name}成长`,
-          '朋友': `感谢您见证${name}的青春岁月`,
-          '同学': `感谢您陪伴${name}的求学时光`,
-          '同事': '感谢您在工作中的支持与陪伴',
-          '老师': '感谢您对新娘的悉心教导',
-          '长辈': '感谢您对新娘的关爱与呵护',
-          '亲戚': '感谢您对新娘的关心与照顾',
+          '父母': `感谢您养育了美丽的${brideName}，您的爱是她最珍贵的财富`,
+          '父亲': `感谢您养育了美丽的${brideName}，您的爱是她最珍贵的财富`,
+          '母亲': `感谢您养育了美丽的${brideName}，您的爱是她最珍贵的财富`,
+          '爸爸': `感谢您养育了美丽的${brideName}，您的爱是她最珍贵的财富`,
+          '妈妈': `感谢您养育了美丽的${brideName}，您的爱是她最珍贵的财富`,
+          '兄弟姐妹': `感谢您陪伴${brideName}成长，这份手足之情弥足珍贵`,
+          '哥哥': `感谢您陪伴${brideName}成长，这份手足之情弥足珍贵`,
+          '姐姐': `感谢您陪伴${brideName}成长，这份手足之情弥足珍贵`,
+          '弟弟': `感谢您陪伴${brideName}成长，这份手足之情弥足珍贵`,
+          '妹妹': `感谢您陪伴${brideName}成长，这份手足之情弥足珍贵`,
+          '朋友': `感谢您见证${brideName}的青春岁月，友谊地久天长`,
+          '同学': `感谢您陪伴${brideName}的求学时光，同窗情谊永难忘`,
+          '同事': `感谢您在工作中的支持与陪伴，让${brideName}在职场中倍感温暖`,
+          '领导': `感谢您在工作中的悉心指导与关怀，您的支持让${brideName}倍感荣幸`,
+          '老师': `感谢您对${brideName}的悉心教导与栽培，师恩如山永难忘`,
+          '长辈': `感谢您对${brideName}的关爱与呵护，您的祝福是我们最大的荣幸`,
+          '亲戚': `感谢您对${brideName}的关心与照顾，这份亲情温暖如春`,
+          '表亲': `感谢您对${brideName}的关心与照顾，这份亲情温暖如春`,
+          '堂亲': `感谢您对${brideName}的关心与照顾，这份亲情温暖如春`,
+          '家人们': `感谢家人们对${brideName}的关爱与支持，有你们的陪伴是最大的幸福`,
         }
         
-        return brideGreetings[guestRelation] || `感谢您作为新娘的${guestRelation}前来见证`
+        return brideGreetings[guestRelation] || `感谢您作为${brideName}的${guestRelation}前来见证我们的幸福时刻`
       }
       
       // 新郎方的关系提示语
       if (isGroomSide) {
-        const useName = useNameRelations.includes(guestRelation)
-        const name = useName ? groomName : '新郎'
-        
         const groomGreetings = {
-          '父母': `感谢您养育了优秀的${name}`,
-          '父亲': `感谢您养育了优秀的${name}`,
-          '母亲': `感谢您养育了优秀的${name}`,
-          '爸爸': `感谢您养育了优秀的${name}`,
-          '妈妈': `感谢您养育了优秀的${name}`,
-          '兄弟姐妹': `感谢您陪伴${name}成长`,
-          '哥哥': `感谢您陪伴${name}成长`,
-          '姐姐': `感谢您陪伴${name}成长`,
-          '弟弟': `感谢您陪伴${name}成长`,
-          '妹妹': `感谢您陪伴${name}成长`,
-          '朋友': `感谢您见证${name}的青春岁月`,
-          '同学': `感谢您陪伴${name}的求学时光`,
-          '同事': '感谢您在工作中的支持与陪伴',
-          '老师': '感谢您对新郎的悉心教导',
-          '长辈': '感谢您对新郎的关爱与呵护',
-          '亲戚': '感谢您对新郎的关心与照顾',
+          '父母': `感谢您养育了优秀的${groomName}，您的爱是他最珍贵的财富`,
+          '父亲': `感谢您养育了优秀的${groomName}，您的爱是他最珍贵的财富`,
+          '母亲': `感谢您养育了优秀的${groomName}，您的爱是他最珍贵的财富`,
+          '爸爸': `感谢您养育了优秀的${groomName}，您的爱是他最珍贵的财富`,
+          '妈妈': `感谢您养育了优秀的${groomName}，您的爱是他最珍贵的财富`,
+          '兄弟姐妹': `感谢您陪伴${groomName}成长，这份手足之情弥足珍贵`,
+          '哥哥': `感谢您陪伴${groomName}成长，这份手足之情弥足珍贵`,
+          '姐姐': `感谢您陪伴${groomName}成长，这份手足之情弥足珍贵`,
+          '弟弟': `感谢您陪伴${groomName}成长，这份手足之情弥足珍贵`,
+          '妹妹': `感谢您陪伴${groomName}成长，这份手足之情弥足珍贵`,
+          '朋友': `感谢您见证${groomName}的青春岁月，友谊地久天长`,
+          '同学': `感谢您陪伴${groomName}的求学时光，同窗情谊永难忘`,
+          '同事': `感谢您在工作中的支持与陪伴，让${groomName}在职场中倍感温暖`,
+          '领导': `感谢您在工作中的悉心指导与关怀，您的支持让${groomName}倍感荣幸`,
+          '老师': `感谢您对${groomName}的悉心教导与栽培，师恩如山永难忘`,
+          '长辈': `感谢您对${groomName}的关爱与呵护，您的祝福是我们最大的荣幸`,
+          '亲戚': `感谢您对${groomName}的关心与照顾，这份亲情温暖如春`,
+          '表亲': `感谢您对${groomName}的关心与照顾，这份亲情温暖如春`,
+          '堂亲': `感谢您对${groomName}的关心与照顾，这份亲情温暖如春`,
+          '家人们': `感谢家人们对${groomName}的关爱与支持，有你们的陪伴是最大的幸福`,
         }
         
-        return groomGreetings[guestRelation] || `感谢您作为新郎的${guestRelation}前来见证`
+        return groomGreetings[guestRelation] || `感谢您作为${groomName}的${guestRelation}前来见证我们的幸福时刻`
       }
       
       // 只有关系信息，没有分组
@@ -82,10 +80,10 @@ const Hero = ({ onEnter, guestName, guestGroup, guestRelation }) => {
     
     // 只有分组信息，没有关系
     if (isBrideSide) {
-      return '感谢您作为新娘方的贵宾前来见证'
+      return `感谢您作为${brideName}方的贵宾前来见证`
     }
     if (isGroomSide) {
-      return '感谢您作为新郎方的贵宾前来见证'
+      return `感谢您作为${groomName}方的贵宾前来见证`
     }
     
     return null
