@@ -45,6 +45,7 @@ const AboutUs = () => {
               <img
                 src="/images/bride.jpg"
                 alt="新娘"
+                loading="lazy"
                 className="w-full h-auto object-cover"
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/400x600/fbcfe8/ffffff?text=新娘'
@@ -65,6 +66,7 @@ const AboutUs = () => {
               <img
                 src="/images/groom.jpg"
                 alt="新郎"
+                loading="lazy"
                 className="w-full h-auto object-cover"
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/400x600/f9a8d4/ffffff?text=新郎'
@@ -104,6 +106,7 @@ const AboutUs = () => {
                   <img
                     src={photo.url}
                     alt={photo.alt}
+                    loading="lazy"
                     className="w-full h-64 object-cover hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
                       e.target.src = `https://via.placeholder.com/400x300/f9a8d4/ffffff?text=${photo.alt}`

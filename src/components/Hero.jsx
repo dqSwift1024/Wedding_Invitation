@@ -175,7 +175,7 @@ const Hero = ({ onEnter, guestName, guestGroup, guestRelation }) => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-8 max-w-3xl mx-auto text-left"
           >
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-gradient mb-2.5 tracking-wide">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-light text-gradient mb-2.5 tracking-wide">
               {guestName}，您好！
             </h2>
             {personalizedGreeting ? (

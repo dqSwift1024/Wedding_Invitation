@@ -75,6 +75,7 @@ const Gallery = () => {
                   <img
                     src={photo.url}
                     alt={photo.alt}
+                    loading="lazy"
                     className="w-full h-[400px] md:h-[500px] object-cover hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
                       e.target.src = `https://via.placeholder.com/400x600/f9a8d4/ffffff?text=${photo.alt}`
