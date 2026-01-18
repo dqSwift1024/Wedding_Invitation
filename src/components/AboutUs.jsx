@@ -100,15 +100,19 @@ const AboutUs = () => {
             }}
             className="pb-12"
           >
-            {photos.map(photo => (
+            {photos.map((photo, index) => (
               <SwiperSlide key={photo.id}>
                 <div className="overflow-hidden rounded-xl shadow-lg">
                   <img
                     src={photo.url}
                     alt={photo.alt}
-                    loading="lazy"
+                    loading={index < 2 ? "eager" : "lazy"}
+                    decoding="async"
+                    width="1200"
+                    height="800"
                     className="w-full h-64 object-cover hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
+                      console.error(`图片加载失败: ${photo.url}`);
                       e.target.src = `https://via.placeholder.com/400x300/f9a8d4/ffffff?text=${photo.alt}`
                     }}
                   />

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
 import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaLocationArrow } from 'react-icons/fa'
+import { mapLocation, getAmapStaticMapUrl } from '../config/mapLocation'
 
 const WeddingInfo = () => {
   const ref = useRef(null)
@@ -9,16 +10,18 @@ const WeddingInfo = () => {
   const [showMapSelector, setShowMapSelector] = useState(false)
 
   const openMap = (type) => {
-    const address = encodeURIComponent('湖北省麻城市白果镇白果宾馆')
-    const lat = 31.182
-    const lng = 115.032
+    const address = encodeURIComponent(mapLocation.address)
+    // 使用配置文件中的坐标
+    const lat = mapLocation.latitude
+    const lng = mapLocation.longitude
     
     if (type === 'gaode') {
-      window.open(`https://uri.amap.com/marker?position=${lng},${lat}&name=${address}`)
+      window.open(`https://uri.amap.com/marker?position=${lng},${lat}&name=${address}&coordinate=gaode&callnative=1`)
     } else if (type === 'baidu') {
-      window.open(`https://api.map.baidu.com/marker?location=${lat},${lng}&title=${address}&content=${address}&output=html`)
+      // 百度地图需要 BD-09 坐标系，从 GCJ-02 转换
+      window.open(`https://api.map.baidu.com/marker?location=${lat},${lng}&title=${address}&content=${address}&output=html&coord_type=gcj02`)
     } else if (type === 'tencent') {
-      window.open(`https://apis.map.qq.com/uri/v1/marker?marker=coord:${lat},${lng};title:白果宾馆;addr:${address}`)
+      window.open(`https://apis.map.qq.com/uri/v1/marker?marker=coord:${lat},${lng};title:白果宾馆;addr:${address}&referer=wedding`)
     }
     setShowMapSelector(false)
   }
@@ -93,19 +96,25 @@ const WeddingInfo = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-rose-gold-600 mb-2">婚礼地址</h3>
-                <p className="text-gray-700 text-lg mb-1">湖北省麻城市白果镇白果宾馆</p>
+                <p className="text-gray-700 text-lg mb-1">{mapLocation.address}</p>
                 <p className="text-gray-500">Wedding Venue</p>
               </div>
             </div>
             
-            {/* 地图图片 - 腾讯地图静态图 */}
-            <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
+            {/* 地图图片 - 高德地图静态图 */}
+            <div className="mb-6 rounded-xl overflow-hidden shadow-lg bg-gray-100">
               <img 
-                src="https://apis.map.qq.com/ws/staticmap/v2/?center=31.182,115.032&zoom=15&size=600*300&maptype=roadmap&markers=size:large|color:0xff0000|label:宾|31.182,115.032&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"
-                alt="婚礼地址地图"
+                src={getAmapStaticMapUrl()}
+                alt={`婚礼地址地图 - ${mapLocation.address}`}
+                loading="eager"
+                width={mapLocation.mapSize.width}
+                height={mapLocation.mapSize.height}
                 className="w-full h-64 object-cover"
                 onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/600x300/f9a8d4/ffffff?text=地图加载中...'
+                  console.error('地图加载失败，使用备用地图');
+                  // 备用方案：使用腾讯地图
+                  const { longitude, latitude } = mapLocation
+                  e.target.src = `https://apis.map.qq.com/ws/staticmap/v2/?center=${latitude},${longitude}&zoom=${mapLocation.zoom}&size=${mapLocation.mapSize.width}*${mapLocation.mapSize.height}&maptype=roadmap&markers=size:large|color:0xff0000|label:宾|${latitude},${longitude}&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77`
                 }}
               />
             </div>
